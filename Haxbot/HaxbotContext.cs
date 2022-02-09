@@ -1,4 +1,5 @@
 ﻿using Haxbot.Entities;
+using Haxbot.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Haxbot;

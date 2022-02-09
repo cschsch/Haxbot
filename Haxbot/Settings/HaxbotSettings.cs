@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Haxbot;
+namespace Haxbot.Settings;
 
 public static class HaxbotSettings
 {
@@ -12,4 +12,8 @@ public static class HaxbotSettings
 
     public static string DatabasePath => Configuration.DatabasePath;
     public static string ConnectionString => string.Format(Configuration.ConnectionStringTemplate, new[] { Configuration.DatabasePath });
+    public static string HaxballHeadlessUrl => Configuration.HaxballHeadlessUrl;
+    public static RoomConfiguration RoomConfiguration => Configuration.RoomConfiguration;
+    public static string[] Admins => Configuration.GameAdmins;
+    public static string BotOwner => Configuration.BotOwner;
 }
