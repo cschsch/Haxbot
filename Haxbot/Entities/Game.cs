@@ -1,14 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Haxbot;
-
-public enum GameState
-{
-    Default,
-    Undecided,
-    RedWon,
-    BlueWon
-}
+namespace Haxbot.Entities;
 
 public class Game : Entity
 {

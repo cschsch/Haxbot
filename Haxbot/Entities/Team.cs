@@ -1,4 +1,4 @@
-﻿namespace Haxbot;
+﻿namespace Haxbot.Entities;
 
 public class Team : Entity
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Haxbot;
+namespace Haxbot.Entities;
 
 public class Player : Entity
 {
