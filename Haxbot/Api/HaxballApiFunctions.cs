@@ -14,8 +14,13 @@ public class HaxballApiFunctions
         return true;
     }
 
-    public bool AddFinishedGame(HaxballScores scores)
+    public bool FinishGame(HaxballScores scores)
     {
         return true;
+    }
+
+    public string HandleCommand(HaxballPlayer player, string message)
+    {
+        return message;
     }
 }

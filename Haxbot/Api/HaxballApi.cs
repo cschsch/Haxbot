@@ -7,13 +7,13 @@ public class HaxballApi
 {
     public string Token { get; }
     public Page Page { get; }
-    public HaxballApiFunctions HaxballApiFunctions { get; }
+    public HaxballApiFunctions ApiFunctions { get; }
 
-    public HaxballApi(string token, Page page, HaxballApiFunctions haxballApiFunctions)
+    public HaxballApi(string token, Page page, HaxballApiFunctions apiFunctions)
     {
         Token = token;
         Page = page;
-        HaxballApiFunctions = haxballApiFunctions;
+        ApiFunctions = apiFunctions;
     }
 
     public async Task<string> CreateRoomAsync()
@@ -25,16 +25,26 @@ public class HaxballApi
     roomConfig.token = token;
     room = HBInit(roomConfig);
     room.onPlayerJoin = function (player) {      
-        if (admins.includes(player.auth))
-            room.setPlayerAdmin(player.id, true);
+        if (!admins.includes(player.auth)) return;
+        room.setPlayerAdmin(player.id, true);
     };
     room.onGameStart = function (byPlayer) {
         const players = getPlayerList();
-        players.forEach(player => addPlayer(player));
+        for (const player of players) {
+            const couldAddPlayer = addPlayer(player);
+            if (couldAddPlayer) continue;
+            room.sendChat(`Failed to add ${player.name} to database!`);
+        }
     };
     room.onTeamVictory = function (scores) {
-        addFinishedGame(scores);
-    }
+        const couldFinishGame = finishGame(scores);
+        if (couldFinishGame) return;
+        room.sendChat(`Failed to save game results to database!`);
+    };
+    room.onPlayerChat = function (player, message) {
+        const answer = handleCommand(player, message);
+        room.sendChat(answer);
+    };
 }", HaxbotSettings.RoomConfiguration, Token, HaxbotSettings.Admins);
 
         return await Page
@@ -47,8 +57,9 @@ public class HaxballApi
 
     private async Task ExposeFunctions()
     {
-        var exposeAddPlayer = Page.ExposeFunctionAsync<HaxballPlayer, bool>("addPlayer", player => HaxballApiFunctions.AddPlayer(player));
-        var exposeAddFinishedGame = Page.ExposeFunctionAsync<HaxballScores, bool>("addFinishedGame", scores => HaxballApiFunctions.AddFinishedGame(scores));
-        await Task.WhenAll(exposeAddPlayer, exposeAddFinishedGame);
+        var exposeAddPlayer = Page.ExposeFunctionAsync<HaxballPlayer, bool>("addPlayer",ApiFunctions.AddPlayer);
+        var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
+        var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
+        await Task.WhenAll(exposeAddPlayer, exposeFinishGame, exposeHandleCommand);
     }
 }
