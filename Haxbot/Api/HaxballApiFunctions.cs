@@ -1,4 +1,6 @@
-﻿namespace Haxbot.Api;
+﻿using Haxbot.Entities;
+
+namespace Haxbot.Api;
 
 public class HaxballApiFunctions
 {
@@ -9,7 +11,7 @@ public class HaxballApiFunctions
         Context = context;
     }
 
-    public bool AddPlayer(HaxballPlayer player)
+    public bool StartGame(HaxballPlayer[] players)
     {
         return true;
     }

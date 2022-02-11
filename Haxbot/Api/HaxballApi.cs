@@ -30,16 +30,14 @@ public class HaxballApi
     };
     room.onGameStart = function (byPlayer) {
         const players = getPlayerList();
-        for (const player of players) {
-            const couldAddPlayer = addPlayer(player);
-            if (couldAddPlayer) continue;
-            room.sendChat(`Failed to add ${player.name} to database!`);
-        }
+        const couldStartGame = startGame(players);
+        if (couldStartGame) return;
+        room.sendChat(`Failed to save game to database!`);
     };
     room.onTeamVictory = function (scores) {
         const couldFinishGame = finishGame(scores);
         if (couldFinishGame) return;
-        room.sendChat(`Failed to save game results to database!`);
+        room.sendChat(`Failed to save results to database!`);
     };
     room.onPlayerChat = function (player, message) {
         const answer = handleCommand(player, message);
@@ -57,7 +55,7 @@ public class HaxballApi
 
     private async Task ExposeFunctions()
     {
-        var exposeAddPlayer = Page.ExposeFunctionAsync<HaxballPlayer, bool>("addPlayer", ApiFunctions.AddPlayer);
+        var exposeAddPlayer = Page.ExposeFunctionAsync<HaxballPlayer[], bool>("startGame", ApiFunctions.StartGame);
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
         await Task.WhenAll(exposeAddPlayer, exposeFinishGame, exposeHandleCommand);
