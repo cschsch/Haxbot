@@ -11,11 +11,12 @@ public class Game : Entity
     [Required]
     public GameState State { get; set; }
 
-    public Game(Team red, Team blue) : base()
+    public Game(Team red, Team blue, GameState state) : base()
     {
         Red = red;
         Blue = blue;
+        State = state;
     }
 
-    public Game() : this(new Team(), new Team()) { }
+    public Game() : this(new Team(), new Team(), GameState.Default) { }
 }
