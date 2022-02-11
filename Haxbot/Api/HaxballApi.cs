@@ -55,9 +55,9 @@ public class HaxballApi
 
     private async Task ExposeFunctions()
     {
-        var exposeAddPlayer = Page.ExposeFunctionAsync<HaxballPlayer[], bool>("startGame", ApiFunctions.StartGame);
+        var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], bool>("startGame", ApiFunctions.StartGame);
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
-        await Task.WhenAll(exposeAddPlayer, exposeFinishGame, exposeHandleCommand);
+        await Task.WhenAll(exposeStartGame, exposeFinishGame, exposeHandleCommand);
     }
 }
