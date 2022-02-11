@@ -11,11 +11,11 @@ public class Configuration
 
     public Configuration()
     {
-        DatabasePath = "haxbot.db";
+        DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), nameof(Haxbot), "haxbot.db");
         ConnectionStringTemplate = "Data Source={0}";
         HaxballHeadlessUrl = "https://html5.haxball.com/headless";
         RoomConfiguration = new RoomConfiguration();
         GameAdmins = Array.Empty<string>();
-        BotOwner = String.Empty;
+        BotOwner = string.Empty;
     }
 }
