@@ -12,4 +12,10 @@ public class HaxballPlayer
         Name = string.Empty;
         Auth = string.Empty;
     }
+
+    public HaxballPlayer EnrichAuth(string[][] idAuths)
+    {
+        Auth = idAuths.Single(idAuth => int.Parse(idAuth[0]) == Id)[1];
+        return this;
+    }
 }

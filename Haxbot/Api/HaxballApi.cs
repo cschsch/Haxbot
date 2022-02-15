@@ -24,13 +24,15 @@ public class HaxballApi
         await Page.EvaluateFunctionAsync(@"(roomConfig, token, admins) => {
     roomConfig.token = token;
     room = HBInit(roomConfig);
-    room.onPlayerJoin = function (player) {      
+    idAuths = [];
+    room.onPlayerJoin = function (player) {
+        idAuths.push([player.id, player.auth]);
         if (!admins.includes(player.auth)) return;
         room.setPlayerAdmin(player.id, true);
     };
     room.onGameStart = function (byPlayer) {
-        const players = getPlayerList();
-        const couldStartGame = startGame(players);
+        const players = room.getPlayerList();
+        const couldStartGame = startGame(players, idAuths);
         if (couldStartGame) return;
         room.sendChat(`Failed to save game to database!`);
     };
@@ -55,7 +57,7 @@ public class HaxballApi
 
     private async Task ExposeFunctions()
     {
-        var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], bool>("startGame", ApiFunctions.StartGame);
+        var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], string[][], bool>("startGame", (players, idAuths) => ApiFunctions.StartGame(players.Select(player => player.EnrichAuth(idAuths)).ToArray()));
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
         await Task.WhenAll(exposeStartGame, exposeFinishGame, exposeHandleCommand);
