@@ -7,6 +7,9 @@ public class HaxballApiFunctions
     public HaxbotContext Context { get; }
     private Game CurrentGame { get; set; } = new Game();
 
+    public delegate void RoomClosedHandler(object sender, EventArgs e);
+    public event RoomClosedHandler? RoomClosed;
+
     public HaxballApiFunctions(HaxbotContext context)
     {
         Context = context;
@@ -46,6 +49,11 @@ public class HaxballApiFunctions
         Context.SaveChanges();
 
         return true;
+    }
+
+    public void CloseRoom()
+    {
+        RoomClosed?.Invoke(this, EventArgs.Empty);
     }
 
     public string HandleCommand(HaxballPlayer player, string message)
