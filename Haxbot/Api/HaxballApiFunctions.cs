@@ -53,6 +53,7 @@ public class HaxballApiFunctions
 
     public void CloseRoom()
     {
+        Context.Dispose();
         RoomClosed?.Invoke(this, EventArgs.Empty);
     }
 

@@ -12,6 +12,11 @@ var browser = await Puppeteer.LaunchAsync(options);
 var token = Environment.GetCommandLineArgs().FirstOrDefault() ?? throw new ArgumentException("No token provided!");
 var page = await browser.NewPageAsync();
 var haxballApiFunctions = new HaxballApiFunctions(new HaxbotContext());
+haxballApiFunctions.RoomClosed += async (sender, args) =>
+{
+    await browser.CloseAsync();
+    Environment.Exit(0);
+};
 
 var api = new HaxballApi(token, page, haxballApiFunctions);
 var roomLink = await api.CreateRoomAsync();
