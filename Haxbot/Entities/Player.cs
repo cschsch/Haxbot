@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Haxbot.Entities;
 
+[Index(nameof(Auth))]
 public class Player : Entity
 {
     [Required]
