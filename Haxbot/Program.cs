@@ -15,3 +15,4 @@ var haxballApiFunctions = new HaxballApiFunctions(new HaxbotContext());
 
 var api = new HaxballApi(token, page, haxballApiFunctions);
 var roomLink = await api.CreateRoomAsync();
+Thread.Sleep(Timeout.Infinite);
