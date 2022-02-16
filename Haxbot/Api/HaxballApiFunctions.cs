@@ -2,7 +2,7 @@
 
 namespace Haxbot.Api;
 
-public class HaxballApiFunctions
+public class HaxballApiFunctions : IDisposable
 {
     private HaxbotContext Context { get; }
     private Game CurrentGame { get; set; } = new Game();
@@ -62,11 +62,13 @@ public class HaxballApiFunctions
     public void CloseRoom()
     {
         RoomClosed?.Invoke(this, EventArgs.Empty);
-        Context.Dispose();
+        Dispose();
     }
 
     public string HandleCommand(HaxballPlayer player, string message)
     {
         return message;
     }
+
+    public void Dispose() => Context.Dispose();
 }
