@@ -27,6 +27,7 @@ public class HaxballApi
     idAuths = [];
     room.onPlayerJoin = function (player) {
         idAuths.push([player.id, player.auth]);
+        playerJoined(player);
         if (!admins.includes(player.auth)) return;
         room.setPlayerAdmin(player.id, true);
     };
@@ -60,10 +61,13 @@ public class HaxballApi
 
     private async Task ExposeFunctions()
     {
+#pragma warning disable CS8603 // Possible null reference return.
+        var exposePlayerJoined = Page.ExposeFunctionAsync<HaxballPlayer, object>("playerJoined", player => { ApiFunctions.OnPlayerJoin(player); return null; });
+#pragma warning restore CS8603 // Possible null reference return.
         var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], string[][], bool>("startGame", (players, idAuths) => ApiFunctions.StartGame(players.Select(player => player.EnrichAuth(idAuths)).ToArray()));
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeCloseRoom = Page.ExposeFunctionAsync("closeRoom", ApiFunctions.CloseRoom);
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
-        await Task.WhenAll(exposeStartGame, exposeFinishGame, exposeHandleCommand);
+        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeHandleCommand);
     }
 }

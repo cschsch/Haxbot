@@ -7,12 +7,20 @@ public class HaxballApiFunctions
     public HaxbotContext Context { get; }
     private Game CurrentGame { get; set; } = new Game();
 
+    public delegate void PlayerJoinedHandler(object sender, PlayerJoinedEventArgs e);
+    public event PlayerJoinedHandler? PlayerJoined;
+
     public delegate void RoomClosedHandler(object sender, EventArgs e);
     public event RoomClosedHandler? RoomClosed;
 
     public HaxballApiFunctions(HaxbotContext context)
     {
         Context = context;
+    }
+
+    public void OnPlayerJoin(HaxballPlayer player)
+    {
+        PlayerJoined?.Invoke(this, new PlayerJoinedEventArgs(player));
     }
 
     public bool StartGame(HaxballPlayer[] players)
@@ -53,8 +61,8 @@ public class HaxballApiFunctions
 
     public void CloseRoom()
     {
-        Context.Dispose();
         RoomClosed?.Invoke(this, EventArgs.Empty);
+        Context.Dispose();
     }
 
     public string HandleCommand(HaxballPlayer player, string message)
