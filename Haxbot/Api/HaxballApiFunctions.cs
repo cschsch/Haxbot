@@ -4,7 +4,7 @@ namespace Haxbot.Api;
 
 public class HaxballApiFunctions
 {
-    public HaxbotContext Context { get; }
+    private HaxbotContext Context { get; }
     private Game CurrentGame { get; set; } = new Game();
 
     public delegate void PlayerJoinedHandler(object sender, PlayerJoinedEventArgs e);
