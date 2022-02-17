@@ -2,7 +2,16 @@
 
 namespace Haxbot.Api;
 
-public class HaxballApiFunctions : IDisposable
+public interface IHaxballApiFunctions
+{
+    void OnPlayerJoin(HaxballPlayer player);
+    bool StartGame(HaxballPlayer[] players);
+    bool FinishGame(HaxballScores scores);
+    void CloseRoom();
+    string HandleCommand(HaxballPlayer player, string message);
+}
+
+public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
 {
     private HaxbotContext Context { get; }
     private Game CurrentGame { get; set; } = new Game();

@@ -5,20 +5,22 @@ namespace Haxbot.Api;
 
 public class HaxballApi
 {
-    public string Token { get; }
+    public string? Token { get; }
     public Page Page { get; }
-    public HaxballApiFunctions ApiFunctions { get; }
+    public IHaxballApiFunctions ApiFunctions { get; }
+    private Configuration Configuration { get; }
 
-    public HaxballApi(string token, Page page, HaxballApiFunctions apiFunctions)
+    public HaxballApi(string? token, Page page, IHaxballApiFunctions apiFunctions, Configuration configuration)
     {
         Token = token;
         Page = page;
         ApiFunctions = apiFunctions;
+        Configuration = configuration;
     }
 
     public async Task<string> CreateRoomAsync()
     {
-        await Page.GoToAsync(HaxbotSettings.HaxballHeadlessUrl, WaitUntilNavigation.Networkidle2);
+        await Page.GoToAsync(Configuration.HaxballHeadlessUrl, WaitUntilNavigation.Networkidle2);
         await ExposeFunctions();
 
         await Page.EvaluateFunctionAsync(@"(roomConfig, token, admins) => {
@@ -49,7 +51,7 @@ public class HaxballApi
         const answer = handleCommand(player, message);
         room.sendChat(answer);
     };
-}", HaxbotSettings.RoomConfiguration, Token, HaxbotSettings.Admins);
+}", Configuration.RoomConfiguration, Token, Configuration.GameAdmins);
 
         return await Page
             .Frames

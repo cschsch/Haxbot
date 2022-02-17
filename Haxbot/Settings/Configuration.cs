@@ -1,4 +1,6 @@
-﻿namespace Haxbot.Settings;
+﻿using System.Text.Json.Serialization;
+
+namespace Haxbot.Settings;
 
 public class Configuration
 {
@@ -8,6 +10,9 @@ public class Configuration
     public RoomConfiguration RoomConfiguration { get; set; }
     public string[] GameAdmins { get; set; }
     public string BotOwner { get; set; }
+
+    [JsonIgnore]
+    public string ConnectionString => string.Format(ConnectionStringTemplate, new[] { DatabasePath });
 
     public Configuration()
     {
