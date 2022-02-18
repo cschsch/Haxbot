@@ -2,14 +2,14 @@
 
 namespace Haxbot.Settings;
 
-public class Configuration
+public record Configuration
 {
-    public string DatabasePath { get; set; }
-    public string ConnectionStringTemplate { get; set; }
-    public string HaxballHeadlessUrl { get; set; }
-    public RoomConfiguration RoomConfiguration { get; set; }
-    public string[] GameAdmins { get; set; }
-    public string BotOwner { get; set; }
+    public string DatabasePath { get; init; }
+    public string ConnectionStringTemplate { get; init; }
+    public string HaxballHeadlessUrl { get; init; }
+    public RoomConfiguration RoomConfiguration { get; init; }
+    public string[] GameAdmins { get; init; }
+    public string BotOwner { get; init; }
 
     [JsonIgnore]
     public string ConnectionString => string.Format(ConnectionStringTemplate, new[] { DatabasePath });

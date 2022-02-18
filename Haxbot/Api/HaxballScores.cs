@@ -1,7 +1,7 @@
 ﻿namespace Haxbot.Api;
 
-public class HaxballScores
+public record HaxballScores
 {
-    public int Red { get; set; }
-    public int Blue { get; set; }
+    public int Red { get; init; }
+    public int Blue { get; init; }
 }

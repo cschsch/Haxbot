@@ -1,21 +1,14 @@
 ﻿namespace Haxbot.Api;
 
-public class HaxballPlayer
+public record HaxballPlayer
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public TeamId Team { get; set; }
-    public string Auth { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; } = default!;
+    public TeamId Team { get; init; }
+    public string Auth { get; init; } = default!;
 
-    public HaxballPlayer()
-    {
-        Name = string.Empty;
-        Auth = string.Empty;
-    }
-
-    public HaxballPlayer EnrichAuth(string[][] idAuths)
-    {
-        Auth = idAuths.Single(idAuth => int.Parse(idAuth[0]) == Id)[1];
-        return this;
-    }
+    public HaxballPlayer EnrichAuth(string[][] idAuths) => this with 
+    { 
+        Auth = idAuths.Single(idAuth => int.Parse(idAuth[0]) == Id)[1] 
+    };
 }

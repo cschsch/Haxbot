@@ -1,15 +1,9 @@
 ﻿namespace Haxbot.Settings;
 
-public class RoomConfiguration
+public record RoomConfiguration
 {
-    public string RoomName { get; set; }
-    public string? Password { get; set; }
-    public bool Public { get; set; }
-    public bool NoPlayer { get; set; }
-
-    public RoomConfiguration()
-    {
-        RoomName = string.Empty;
-        NoPlayer = true;
-    }
+    public string RoomName { get; init; } = string.Empty;
+    public string? Password { get; init; } = default;
+    public bool Public { get; init; }
+    public bool NoPlayer { get; init; } = true;
 }
