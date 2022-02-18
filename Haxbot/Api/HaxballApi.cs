@@ -10,7 +10,7 @@ public class HaxballApi
     public IHaxballApiFunctions ApiFunctions { get; }
     private Configuration Configuration { get; }
 
-    public HaxballApi(string? token, Page page, IHaxballApiFunctions apiFunctions, Configuration configuration)
+    public HaxballApi(IHaxballApiFunctions apiFunctions, Configuration configuration, Page page, string? token)
     {
         Token = token;
         Page = page;
@@ -27,28 +27,28 @@ public class HaxballApi
     roomConfig.token = token;
     room = HBInit(roomConfig);
     idAuths = [];
-    room.onPlayerJoin = function (player) {
+    room.onPlayerJoin = async function (player) {
         idAuths.push([player.id, player.auth]);
-        playerJoined(player);
+        await playerJoined(player);
         if (!admins.includes(player.auth)) return;
         room.setPlayerAdmin(player.id, true);
     };
-    room.onGameStart = function (byPlayer) {
+    room.onGameStart = async function (byPlayer) {
         const players = room.getPlayerList();
-        const couldStartGame = startGame(players, idAuths);
+        const couldStartGame = await startGame(players, idAuths);
         if (couldStartGame) return;
         room.sendChat(`Failed to save game to database!`);
     };
-    room.onTeamVictory = function (scores) {
-        const couldFinishGame = finishGame(scores);
+    room.onTeamVictory = async function (scores) {
+        const couldFinishGame = await finishGame(scores);
         if (couldFinishGame) return;
         room.sendChat(`Failed to save results to database!`);
     };
-    room.onPlayerLeave = function (player) {
-        if (room.getPlayerList().length === 0) closeRoom();
+    room.onPlayerLeave = async function (player) {
+        if (room.getPlayerList().length === 0) await closeRoom();
     };
-    room.onPlayerChat = function (player, message) {
-        const answer = handleCommand(player, message);
+    room.onPlayerChat = async function (player, message) {
+        const answer = await handleCommand(player, message);
         room.sendChat(answer);
     };
 }", Configuration.RoomConfiguration, Token, Configuration.GameAdmins);
@@ -63,9 +63,7 @@ public class HaxballApi
 
     private async Task ExposeFunctions()
     {
-#pragma warning disable CS8603 // Possible null reference return.
-        var exposePlayerJoined = Page.ExposeFunctionAsync<HaxballPlayer, object>("playerJoined", player => { ApiFunctions.OnPlayerJoin(player); return null; });
-#pragma warning restore CS8603 // Possible null reference return.
+        var exposePlayerJoined = Page.ExposeFunctionAsync<HaxballPlayer, object>("playerJoined", player => { ApiFunctions.OnPlayerJoin(player); return default!; });
         var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], string[][], bool>("startGame", (players, idAuths) => ApiFunctions.StartGame(players.Select(player => player.EnrichAuth(idAuths)).ToArray()));
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeCloseRoom = Page.ExposeFunctionAsync("closeRoom", ApiFunctions.CloseRoom);
