@@ -36,10 +36,18 @@ public class HaxbotApp
             await browser.DisposeAsync();
             cancellationTokenSource.Cancel();
         };
+        using var waitEvent = new ManualResetEventSlim(false);
+        haxballApiFunctions.PlayerJoined += (sender, args) =>
+        {
+            waitEvent.Set();
+        };
 
         var api = new HaxballApi(haxballApiFunctions, Configuration, page, token);
         var roomLink = await api.CreateRoomAsync();
         Console.WriteLine(roomLink);
+
+        var playerHasEntered = waitEvent.Wait(30000);
+        if (!playerHasEntered) cancellationTokenSource.Cancel();
 
         try
         {
