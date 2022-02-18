@@ -8,7 +8,7 @@ public record Configuration
     public string ConnectionStringTemplate { get; init; }
     public string HaxballHeadlessUrl { get; init; }
     public RoomConfiguration RoomConfiguration { get; init; }
-    public string[] GameAdmins { get; init; }
+    public string[] RoomAdmins { get; init; }
     public string BotOwner { get; init; }
 
     [JsonIgnore]
@@ -20,7 +20,7 @@ public record Configuration
         ConnectionStringTemplate = "Data Source={0}";
         HaxballHeadlessUrl = "https://html5.haxball.com/headless";
         RoomConfiguration = new RoomConfiguration();
-        GameAdmins = Array.Empty<string>();
+        RoomAdmins = Array.Empty<string>();
         BotOwner = string.Empty;
     }
 }

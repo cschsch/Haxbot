@@ -81,7 +81,7 @@ HBInit = roomConfiguration => {{
         // arrange
         var auth = "admin";
         var page = await SetUpPage("_ => { return { setPlayerAdmin: (id, value) => window.admin = value }; }");
-        var configuration = Configuration with { GameAdmins = new [] { auth } };
+        var configuration = Configuration with { RoomAdmins = new [] { auth } };
         var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), configuration, page, string.Empty);
 
         // act

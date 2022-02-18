@@ -51,7 +51,7 @@ public class HaxballApi
         const answer = await handleCommand(player, message);
         room.sendChat(answer);
     };
-}", Configuration.RoomConfiguration, Token, Configuration.GameAdmins);
+}", Configuration.RoomConfiguration, Token, Configuration.RoomAdmins);
 
         return await Page
             .Frames
