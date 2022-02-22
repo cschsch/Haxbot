@@ -1,13 +1,24 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Invocation;
 
 namespace CLI;
 
 public static class CommandExtensions
 {
-    public static Command WithHandler(this Command command, ICommandHandler? handler)
+    public static Command AddOptions(this Command command, params Option[] options)
     {
-        command.Handler = handler;
+        foreach (var option in options)
+        {
+            command.AddOption(option);
+        }
+        return command;
+    }
+
+    public static Command AddGlobalOptions(this Command command, params Option[] options)
+    {
+        foreach (var option in options)
+        {
+            command.AddGlobalOption(option);
+        }
         return command;
     }
 }

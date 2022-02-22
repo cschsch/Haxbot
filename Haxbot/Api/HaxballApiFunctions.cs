@@ -40,7 +40,7 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
         
         foreach (var player in players.Where(player => player.Team != TeamId.Spectators))
         {
-            var mappedPlayer = Context.Players?.SingleOrDefault(p => player.Auth == p.Auth) ?? new Player(player.Name, player.Auth);
+            var mappedPlayer = Context.Players!.SingleOrDefault(p => player.Auth == p.Auth) ?? new Player(player.Name, player.Auth);
             switch (player.Team)
             {
                 case TeamId.Red: red.Players.Add(mappedPlayer); break;

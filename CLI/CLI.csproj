@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22111.2" />
-    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta3.22111.2" />
   </ItemGroup>
 
   <ItemGroup>

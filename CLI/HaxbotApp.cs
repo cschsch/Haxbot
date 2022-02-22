@@ -1,5 +1,6 @@
 ﻿using Haxbot;
 using Haxbot.Api;
+using Haxbot.Entities;
 using Haxbot.Settings;
 using PuppeteerSharp;
 
@@ -55,5 +56,43 @@ public class HaxbotApp
         } catch (TaskCanceledException)
         {
         }
+    }
+
+    public void Names(string auth)
+    {
+        using var context = new HaxbotContext(Configuration);
+        var names = context.Players!.Where(player => player.Auth == auth).Select(player => player.Name);
+        var output = string.Join(Environment.NewLine, names);
+        Console.WriteLine(output);
+    }
+
+    private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, string[] players, bool auth, bool team, DateTime from, DateTime to)
+    {
+        var playersInDb = auth ? context.Players!.ByAuth(players) : context.Players!.ByName(players);
+        var gamesByTime = context.Games!.Between(from, to);
+        var gamesByPlayers = team ? gamesByTime.WithTeam(playersInDb) : gamesByTime.WithAny(playersInDb);
+        return (gamesByPlayers, playersInDb);
+    }
+
+    public void Games(string[] players, bool auth, bool team, DateTime from, DateTime to)
+    {
+        using var context = new HaxbotContext(Configuration);
+        var (games, _) = FilterByOptions(context, players, auth, team, from, to);
+        var amount = games.Count();
+        Console.WriteLine(amount);
+    }
+
+    public Action<string[], bool, bool, DateTime, DateTime, bool, bool> WonOrLost(GameResult result)
+    {
+        if (result == GameResult.Default) throw new ArgumentException("No distinction between games won and lost", nameof(result));
+
+        return (players, auth, team, from, to, red, blue) =>
+        {
+            using var context = new HaxbotContext(Configuration);
+            var (games, playersInDb) = FilterByOptions(context, players, auth, team, from, to);
+            var gamesByState = result == GameResult.Won ? games.WonBy(playersInDb, red, blue) : games.LostBy(playersInDb, red, blue);
+            var amount = gamesByState.Count();
+            Console.WriteLine(amount);
+        };
     }
 }
