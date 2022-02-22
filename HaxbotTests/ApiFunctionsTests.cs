@@ -80,7 +80,7 @@ public class ApiFunctionsTests
     {
         // arrange
         var games = new List<Game>();
-        var context = new Mock<HaxbotContext>(Configuration).Add(games);
+        var context = new Mock<HaxbotContext>(Configuration).Add(games).Add(new List<Player>());
         var functions = new HaxballApiFunctions(context.Object);
 
         var peter = new HaxballPlayer { Name = "peter", Auth = "1", Team = TeamId.Red };

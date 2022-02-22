@@ -68,7 +68,11 @@ public class HaxbotApp
 
     private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, string[] players, bool auth, bool team, DateTime from, DateTime to)
     {
-        var playersInDb = auth ? context.Players!.ByAuth(players) : context.Players!.ByName(players);
+        var playersInDb = players.Any()
+            ? auth 
+                ? context.Players!.ByAuth(players) 
+                : context.Players!.ByName(players)
+            : context.Players!;
         var gamesByTime = context.Games!.Between(from, to);
         var gamesByPlayers = team ? gamesByTime.WithTeam(playersInDb) : gamesByTime.WithAny(playersInDb);
         return (gamesByPlayers, playersInDb);
