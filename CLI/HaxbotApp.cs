@@ -77,9 +77,10 @@ public class HaxbotApp
     public void Games(string[] players, bool auth, bool team, DateTime from, DateTime to)
     {
         using var context = new HaxbotContext(Configuration);
+        var totalGames = context.Games!.Count();
         var (games, _) = FilterByOptions(context, players, auth, team, from, to);
         var amount = games.Count();
-        Console.WriteLine(amount);
+        Console.WriteLine($"{amount}/{totalGames} ({Math.Round(decimal.Divide(amount, totalGames) * 100, 2)}%)");
     }
 
     public Action<string[], bool, bool, DateTime, DateTime, bool, bool> WonOrLost(GameResult result)
@@ -89,10 +90,11 @@ public class HaxbotApp
         return (players, auth, team, from, to, red, blue) =>
         {
             using var context = new HaxbotContext(Configuration);
+            var totalGames = context.Games!.Count();
             var (games, playersInDb) = FilterByOptions(context, players, auth, team, from, to);
             var gamesByState = result == GameResult.Won ? games.WonBy(playersInDb, red, blue) : games.LostBy(playersInDb, red, blue);
             var amount = gamesByState.Count();
-            Console.WriteLine(amount);
+            Console.WriteLine($"{amount}/{totalGames} ({Math.Round(decimal.Divide(amount, totalGames) * 100, 2)}%)");
         };
     }
 }
