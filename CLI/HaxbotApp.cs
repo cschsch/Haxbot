@@ -54,7 +54,8 @@ public class HaxbotApp
         try
         {
             await Task.Delay(Timeout.Infinite, cancellationTokenSource.Token);
-        } catch (TaskCanceledException)
+        }
+        catch (TaskCanceledException)
         {
         }
     }
@@ -70,8 +71,8 @@ public class HaxbotApp
     private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, string[] players, bool auth, bool team, DateTime from, DateTime to)
     {
         var playersInDb = players.Any()
-            ? auth 
-                ? context.Players!.ByAuth(players) 
+            ? auth
+                ? context.Players!.ByAuth(players)
                 : context.Players!.ByName(players)
             : context.Players!;
         var gamesByTime = context.Games!.Between(from, to);
@@ -83,6 +84,11 @@ public class HaxbotApp
     {
         using var context = new HaxbotContext(Configuration);
         var totalGames = context.Games!.Count();
+        if (totalGames == 0)
+        {
+            Console.WriteLine("0/0 (0%)");
+            return;
+        }
         var (games, _) = FilterByOptions(context, players, auth, team, from, to);
         var amount = games.Count();
         Console.WriteLine($"{amount}/{totalGames} ({Math.Round(decimal.Divide(amount, totalGames) * 100, 2)}%)");
@@ -97,6 +103,11 @@ public class HaxbotApp
             using var context = new HaxbotContext(Configuration);
             var (games, playersInDb) = FilterByOptions(context, players, auth, team, from, to);
             var filteredGames = games.Include(game => game.Red.Players).Include(game => game.Blue.Players).ToArray();
+            if (filteredGames.Length == 0)
+            {
+                Console.WriteLine("0/0 (0%)");
+                return;
+            }
             var gamesByState = result == GameResult.Won ? filteredGames.WonBy(playersInDb, red, blue) : filteredGames.LostBy(playersInDb, red, blue);
             var amount = gamesByState.Count();
             Console.WriteLine($"{amount}/{filteredGames.Length} ({Math.Round(decimal.Divide(amount, filteredGames.Length) * 100, 2)}%)");
