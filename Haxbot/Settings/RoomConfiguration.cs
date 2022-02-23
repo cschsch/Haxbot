@@ -6,4 +6,5 @@ public record RoomConfiguration
     public string? Password { get; init; } = default;
     public bool Public { get; init; }
     public bool NoPlayer { get; init; } = true;
+    public string PlayerName { get; init; } = "Haxbot";
 }

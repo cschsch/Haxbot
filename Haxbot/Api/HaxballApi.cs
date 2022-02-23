@@ -45,7 +45,10 @@ public class HaxballApi
         room.sendChat(`Failed to save results to database!`);
     };
     room.onPlayerLeave = async function (player) {
-        if (room.getPlayerList().length === 0) await closeRoom();
+        var players = room.getPlayerList();
+        if (players.length === 0 || (players.length === 1 && players[0].name === roomConfig.playerName)) {
+            await closeRoom();
+        }
     };
     room.onPlayerChat = async function (player, message) {
         const answer = await handleCommand(player, message);
