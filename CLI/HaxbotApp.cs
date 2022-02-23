@@ -2,6 +2,7 @@
 using Haxbot.Api;
 using Haxbot.Entities;
 using Haxbot.Settings;
+using Microsoft.EntityFrameworkCore;
 using PuppeteerSharp;
 
 namespace CLI;
@@ -94,11 +95,11 @@ public class HaxbotApp
         return (players, auth, team, from, to, red, blue) =>
         {
             using var context = new HaxbotContext(Configuration);
-            var totalGames = context.Games!.Count();
             var (games, playersInDb) = FilterByOptions(context, players, auth, team, from, to);
-            var gamesByState = result == GameResult.Won ? games.WonBy(playersInDb, red, blue) : games.LostBy(playersInDb, red, blue);
+            var filteredGames = games.Include(game => game.Red.Players).Include(game => game.Blue.Players).ToArray();
+            var gamesByState = result == GameResult.Won ? filteredGames.WonBy(playersInDb, red, blue) : filteredGames.LostBy(playersInDb, red, blue);
             var amount = gamesByState.Count();
-            Console.WriteLine($"{amount}/{totalGames} ({Math.Round(decimal.Divide(amount, totalGames) * 100, 2)}%)");
+            Console.WriteLine($"{amount}/{filteredGames.Length} ({Math.Round(decimal.Divide(amount, filteredGames.Length) * 100, 2)}%)");
         };
     }
 }

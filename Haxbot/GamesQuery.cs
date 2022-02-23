@@ -13,20 +13,24 @@ public static class GamesQuery
     public static IQueryable<TEntity> Between<TEntity>(this IQueryable<TEntity> entities, DateTime from, DateTime to) where TEntity : Entity
         => entities.Where(entity => from <= entity.Created && to >= entity.Created);
 
-    public static IQueryable<Game> WonBy(this IQueryable<Game> games, IQueryable<Player> players, bool red, bool blue)
+    public static IEnumerable<Game> WonBy(this IEnumerable<Game> games, IQueryable<Player> players, bool red, bool blue)
     {
-        if (red == blue) return games.Where(game => (game.State == GameState.RedWon && game.Red.Players.Any(player => players.Contains(player)))
-                                                     || (game.State == GameState.BlueWon && game.Blue.Players.Any(player => players.Contains(player))));
-        if (red) return games.Where(game => game.State == GameState.RedWon && game.Red.Players.Any(player => players.Contains(player)));
-        return games.Where(game => game.State == GameState.BlueWon && game.Blue.Players.Any(player => players.Contains(player)));
+        bool AnyPlayerWonRed(Game game) => game.State == GameState.RedWon && game.Red.Players.Any(players.Contains);
+        bool AnyPlayerWonBlue(Game game) => game.State == GameState.BlueWon && game.Blue.Players.Any(players.Contains);
+
+        if (red == blue) return games.Where(game => AnyPlayerWonRed(game) || AnyPlayerWonBlue(game));
+        if (red) return games.Where(AnyPlayerWonRed);
+        return games.Where(AnyPlayerWonBlue);
     }
 
-    public static IQueryable<Game> LostBy(this IQueryable<Game> games, IQueryable<Player> players, bool red, bool blue)
+    public static IEnumerable<Game> LostBy(this IEnumerable<Game> games, IQueryable<Player> players, bool red, bool blue)
     {
-        if (red == blue) return games.Where(game => (game.State == GameState.BlueWon && game.Red.Players.Any(player => players.Contains(player)))
-                                                     || (game.State == GameState.RedWon && game.Blue.Players.Any(player => players.Contains(player))));
-        if (red) return games.Where(game => game.State == GameState.BlueWon && game.Red.Players.Any(player => players.Contains(player)));
-        return games.Where(game => game.State == GameState.RedWon && game.Blue.Players.Any(player => players.Contains(player)));
+        bool AnyPlayerLostBlue(Game game) => game.State == GameState.RedWon && game.Blue.Players.Any(players.Contains);
+        bool AnyPlayerLostRed(Game game) => game.State == GameState.BlueWon && game.Red.Players.Any(players.Contains);
+
+        if (red == blue) return games.Where(game => AnyPlayerLostBlue(game) || AnyPlayerLostRed(game));
+        if (red) return games.Where(AnyPlayerLostRed);
+        return games.Where(AnyPlayerLostBlue);
     }
 
     public static IQueryable<Game> WithAny(this IQueryable<Game> games, IQueryable<Player> players)

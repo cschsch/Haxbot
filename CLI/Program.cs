@@ -71,7 +71,7 @@ gamesCommand.AddGlobalOptions(playersOption, authOption, teamOption, fromOption,
 gamesCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to) => app.Games(players, auth, team, from, to), playersOption, authOption, teamOption, fromOption, toOption);
 
 #region Won
-var wonCommand = new Command("won", "Count the amount of games won against the total amount of games.");
+var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
 var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
 var blueWonOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games won by the blue team.");
 wonCommand.AddOptions(redWonOption, blueWonOption);
@@ -79,7 +79,7 @@ wonCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, Da
 #endregion
 
 #region Lost
-var lostCommand = new Command("lost", "Count the amount of games lost against the total amount of games.");
+var lostCommand = new Command("lost", "Count the amount of games lost against the total amount of filtered games.");
 var redLostOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games lost by the red team.");
 var blueLostOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games lost by the blue team.");
 lostCommand.AddOptions(redLostOption, blueLostOption);

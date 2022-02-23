@@ -130,7 +130,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(Enumerable.Empty<Player>().AsQueryable(), false, false);
+        var result = new[] { game }.WonBy(Enumerable.Empty<Player>().AsQueryable(), false, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -145,7 +145,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new [] { new Player() }.AsQueryable(), false, false);
+        var result = new[] { game }.WonBy(new [] { new Player() }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -161,7 +161,7 @@ public class QueryTests
         game.Blue.Players.Add(player);
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { player }.AsQueryable(), false, false);
+        var result = new[] { game }.WonBy(new[] { player }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -177,7 +177,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { player }.AsQueryable(), false, false);
+        var result = new[] { game }.WonBy(new[] { player }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.AreEqual(new [] { game }, result);
@@ -193,7 +193,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { player }.AsQueryable(), false, true);
+        var result = new[] { game }.WonBy(new[] { player }.AsQueryable(), false, true);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -209,7 +209,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { player }.AsQueryable(), true, false);
+        var result = new[] { game }.WonBy(new[] { player }.AsQueryable(), true, false);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
@@ -226,7 +226,7 @@ public class QueryTests
         game.Blue.Players.Add(loser);
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { winner, loser }.AsQueryable(), false, false);
+        var result = new[] { game }.WonBy(new[] { winner, loser }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
@@ -242,7 +242,7 @@ public class QueryTests
         game.Blue.Players.Add(player);
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { player }.AsQueryable(), true, false);
+        var result = new[] { game }.WonBy(new[] { player }.AsQueryable(), true, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -259,7 +259,7 @@ public class QueryTests
         game.Blue.Players.Add(loser);
 
         // act
-        var result = new[] { game }.AsQueryable().WonBy(new[] { winner, loser }.AsQueryable(), true, true);
+        var result = new[] { game }.WonBy(new[] { winner, loser }.AsQueryable(), true, true);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
@@ -274,7 +274,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(Enumerable.Empty<Player>().AsQueryable(), false, false);
+        var result = new[] { game }.LostBy(Enumerable.Empty<Player>().AsQueryable(), false, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -289,7 +289,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { new Player() }.AsQueryable(), false, false);
+        var result = new[] { game }.LostBy(new[] { new Player() }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -305,7 +305,7 @@ public class QueryTests
         game.Blue.Players.Add(player);
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { player }.AsQueryable(), false, false);
+        var result = new[] { game }.LostBy(new[] { player }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.AreEqual(new [] { game }, result);
@@ -321,7 +321,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { player }.AsQueryable(), false, false);
+        var result = new[] { game }.LostBy(new[] { player }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -337,7 +337,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { player }.AsQueryable(), false, true);
+        var result = new[] { game }.LostBy(new[] { player }.AsQueryable(), false, true);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -353,7 +353,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { player }.AsQueryable(), true, false);
+        var result = new[] { game }.LostBy(new[] { player }.AsQueryable(), true, false);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
@@ -370,7 +370,7 @@ public class QueryTests
         game.Blue.Players.Add(loser);
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { winner, loser }.AsQueryable(), false, false);
+        var result = new[] { game }.LostBy(new[] { winner, loser }.AsQueryable(), false, false);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
@@ -386,7 +386,7 @@ public class QueryTests
         game.Blue.Players.Add(player);
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { player }.AsQueryable(), true, false);
+        var result = new[] { game }.LostBy(new[] { player }.AsQueryable(), true, false);
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -403,7 +403,7 @@ public class QueryTests
         game.Blue.Players.Add(loser);
 
         // act
-        var result = new[] { game }.AsQueryable().LostBy(new[] { winner, loser }.AsQueryable(), true, true);
+        var result = new[] { game }.LostBy(new[] { winner, loser }.AsQueryable(), true, true);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
