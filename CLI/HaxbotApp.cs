@@ -68,40 +68,41 @@ public class HaxbotApp
         Console.WriteLine(output);
     }
 
-    private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, string[] players, bool auth, bool team, DateTime from, DateTime to)
+    private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided)
     {
         var playersInDb = players.Any()
             ? auth
                 ? context.Players!.ByAuth(players)
                 : context.Players!.ByName(players)
             : context.Players!;
-        var gamesByTime = context.Games!.Between(from, to);
+        var gamesByUndecided = context.Games!.Where(game => undecided || game.State != GameState.Undecided);
+        var gamesByTime = gamesByUndecided.Between(from, to);
         var gamesByPlayers = team ? gamesByTime.WithTeam(playersInDb) : gamesByTime.WithAny(playersInDb);
         return (gamesByPlayers, playersInDb);
     }
 
-    public void Games(string[] players, bool auth, bool team, DateTime from, DateTime to)
+    public void Games(string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided)
     {
         using var context = new HaxbotContext(Configuration);
-        var totalGames = context.Games!.Count();
+        var totalGames = context.Games!.Count(game => undecided || game.State != GameState.Undecided);
         if (totalGames == 0)
         {
             Console.WriteLine("0/0 (0%)");
             return;
         }
-        var (games, _) = FilterByOptions(context, players, auth, team, from, to);
+        var (games, _) = FilterByOptions(context, players, auth, team, from, to, undecided);
         var amount = games.Count();
         Console.WriteLine($"{amount}/{totalGames} ({Math.Round(decimal.Divide(amount, totalGames) * 100, 2)}%)");
     }
 
-    public Action<string[], bool, bool, DateTime, DateTime, bool, bool> WonOrLost(GameResult result)
+    public Action<string[], bool, bool, DateTime, DateTime, bool, bool, bool> WonOrLost(GameResult result)
     {
         if (result == GameResult.Default) throw new ArgumentException("No distinction between games won and lost", nameof(result));
 
-        return (players, auth, team, from, to, red, blue) =>
+        return (players, auth, team, from, to, undecided, red, blue) =>
         {
             using var context = new HaxbotContext(Configuration);
-            var (games, playersInDb) = FilterByOptions(context, players, auth, team, from, to);
+            var (games, playersInDb) = FilterByOptions(context, players, auth, team, from, to, undecided);
             var filteredGames = games.Include(game => game.Red.Players).Include(game => game.Blue.Players).ToArray();
             if (filteredGames.Length == 0)
             {
