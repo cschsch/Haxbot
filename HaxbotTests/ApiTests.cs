@@ -15,7 +15,7 @@ public class ApiTests
     public Browser Browser { get; set; } = default!;
     public Configuration Configuration { get; set; } = default!;
 
-    private const string RoomUrl = "https://haxballroom.com/";
+    private const string RoomUrl = "https://this-site-does-not-exist.com/";
 
     [OneTimeSetUp]
     public async Task SetUp()
