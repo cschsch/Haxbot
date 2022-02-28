@@ -27,7 +27,7 @@ public class HaxbotApp
 
         var cancellationTokenSource = new CancellationTokenSource();
 
-        var options = new LaunchOptions { Args = new[] { "--disable-features=WebRtcHideLocalIpsWithMdns", "--no-sandbox" }, Headless = headless };
+        var options = new LaunchOptions { Args = new[] { "--disable-features=WebRtcHideLocalIpsWithMdns", "--no-sandbox", "--no-proxy-server" }, Headless = headless };
         await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
         var browser = await Puppeteer.LaunchAsync(options);
         var page = await browser.NewPageAsync();
