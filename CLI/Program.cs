@@ -55,13 +55,6 @@ createCommand.SetHandler((string? token, bool headless) => app.CreateRoom(token,
 #region Query
 var queryCommand = new Command("query", "Query the database");
 
-#region Names
-var namesCommand = new Command("names", "Given a public Auth, get all associated names.");
-var authArgument = new Argument<string>("auth", "Public Auth value of player. See https://www.haxball.com/playerauth");
-namesCommand.Add(authArgument);
-namesCommand.SetHandler((string auth) => app.Names(auth), authArgument);
-#endregion
-
 #region Games
 var gamesCommand = new Command("games", "Query for games. Returns amount of games played against the total amount of games.");
 var playersOption = new Option<string[]>(new[] { "--players", "-p" }, "Look for games where any of these players participated.") { Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
@@ -93,7 +86,6 @@ gamesCommand.Add(wonCommand);
 gamesCommand.Add(lostCommand);
 #endregion
 
-queryCommand.Add(namesCommand);
 queryCommand.Add(gamesCommand);
 #endregion
 

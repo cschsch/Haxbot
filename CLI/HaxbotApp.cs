@@ -60,14 +60,6 @@ public class HaxbotApp
         }
     }
 
-    public void Names(string auth)
-    {
-        using var context = new HaxbotContext(Configuration);
-        var names = context.Players!.Where(player => player.Auth == auth).Select(player => player.Name);
-        var output = string.Join(Environment.NewLine, names);
-        Console.WriteLine(output);
-    }
-
     private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided)
     {
         var playersInDb = players.Any()
