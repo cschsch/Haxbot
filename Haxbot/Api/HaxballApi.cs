@@ -50,6 +50,9 @@ public class HaxballApi
             await closeRoom();
         }
     };
+    room.onStadiumChange = async function (stadium, player) {
+        await setStadium(stadium, player);
+    };
     room.onPlayerChat = async function (player, message) {
         const answer = await handleCommand(player, message);
         room.sendChat(answer);
@@ -70,7 +73,8 @@ public class HaxballApi
         var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], string[][], bool>("startGame", (players, idAuths) => ApiFunctions.StartGame(players.Select(player => player.EnrichAuth(idAuths)).ToArray()));
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeCloseRoom = Page.ExposeFunctionAsync("closeRoom", ApiFunctions.CloseRoom);
+        var exposeSetStadium = Page.ExposeFunctionAsync<string, HaxballPlayer, object>("setStadium", (stadium, player) => { ApiFunctions.SetStadium(stadium, player); return default!; });
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
-        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeHandleCommand);
+        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeSetStadium, exposeHandleCommand);
     }
 }

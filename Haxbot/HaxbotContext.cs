@@ -11,6 +11,7 @@ public class HaxbotContext : DbContext
     public virtual DbSet<Game>? Games { get; set; }
     public Configuration Configuration { get; }
 
+    public HaxbotContext() { Configuration = new(); }
     public HaxbotContext(Configuration configuration)
     {
         Configuration = configuration;

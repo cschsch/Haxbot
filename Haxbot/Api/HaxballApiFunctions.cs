@@ -8,6 +8,7 @@ public interface IHaxballApiFunctions
     bool StartGame(HaxballPlayer[] players);
     bool FinishGame(HaxballScores scores);
     void CloseRoom();
+    void SetStadium(string stadium, HaxballPlayer player);
     string HandleCommand(HaxballPlayer player, string message);
 }
 
@@ -36,7 +37,7 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
     {
         var red = new Team();
         var blue = new Team();
-        CurrentGame = new Game(red, blue, GameState.Undecided);
+        CurrentGame = new Game { Red = red, Blue = blue, State = GameState.Undecided };
         
         foreach (var player in players.Where(player => player.Team != TeamId.Spectators))
         {
@@ -72,6 +73,12 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
     {
         RoomClosed?.Invoke(this, EventArgs.Empty);
         Dispose();
+    }
+
+    public void SetStadium(string stadium, HaxballPlayer player)
+    {
+        CurrentGame.Stadium = stadium;
+        Context.SaveChanges();
     }
 
     public string HandleCommand(HaxballPlayer player, string message)

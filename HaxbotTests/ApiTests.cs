@@ -196,6 +196,22 @@ HBInit = roomConfiguration => {{
     }
 
     [Test]
+    public async Task OnStadiumChange_CallsSetStadium()
+    {
+        // arrange
+        var page = await SetUpPage();
+        var functions = new Mock<IHaxballApiFunctions>();
+        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+
+        // act
+        await api.CreateRoomAsync();
+        await page.EvaluateExpressionAsync("room.onStadiumChange('teeeheee', {})");
+
+        // assert
+        functions.Verify(f => f.SetStadium("teeeheee", It.IsAny<HaxballPlayer>()));
+    }
+
+    [Test]
     public async Task HandleCommand_SendsAnswerInChat()
     {
         // arrange

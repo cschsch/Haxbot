@@ -533,4 +533,43 @@ public class QueryTests
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
     }
+
+    [Test]
+    public void PlayedOn_Futsal_WithEmptyString_IsGame()
+    {
+        // arrange
+        var game = new Game { Stadium = "Futsal" };
+
+        // act
+        var result = new[] { game }.AsQueryable().PlayedOn(string.Empty);
+
+        // assert
+        CollectionAssert.AreEqual(new[] { game }, result);
+    }
+
+    [Test]
+    public void PlayedOn_StadiumDoesNotExist_IsEmpty()
+    {
+        // arrange
+        var game = new Game();
+
+        // act
+        var result = new[] { game }.AsQueryable().PlayedOn("Futsal");
+
+        // assert
+        CollectionAssert.IsEmpty(result);
+    }
+
+    [Test]
+    public void PlayedOn_Futsal_WithFutsal_IsGame()
+    {
+        // arrange
+        var game = new Game { Stadium = "Futsal" };
+
+        // act
+        var result = new[] { game }.AsQueryable().PlayedOn("Futsal");
+
+        // assert
+        CollectionAssert.AreEqual(new[] { game }, result);
+    }
 }

@@ -63,15 +63,16 @@ var teamOption = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look f
 var fromOption = new Option<DateTime>("--from", () => DateTime.MinValue, "Only count games played since the give time.");
 var toOption = new Option<DateTime>("--to", () => DateTime.MaxValue, "Only count games played until the given time.");
 var undecidedOption = new Option<bool>(new[] { "--undecided", "-u" }, () => false, "Include undecided games.");
-gamesCommand.AddGlobalOptions(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption);
-gamesCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided) => app.Games(players, auth, team, from, to, undecided), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption);
+var stadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact matches.");
+gamesCommand.AddGlobalOptions(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
+gamesCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, string stadium) => app.Games(players, auth, team, from, to, undecided, stadium), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
 
 #region Won
 var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
 var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
 var blueWonOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games won by the blue team.");
 wonCommand.AddOptions(redWonOption, blueWonOption);
-wonCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, bool redWon, bool blueWon) => app.WonOrLost(GameResult.Won)(players, auth, team, from, to, undecided, redWon, blueWon), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, redWonOption, blueWonOption);
+wonCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, string stadium, bool redWon, bool blueWon) => app.WonOrLost(GameResult.Won)(players, auth, team, from, to, undecided, stadium, redWon, blueWon), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption, redWonOption, blueWonOption);
 #endregion
 
 #region Lost
@@ -79,7 +80,7 @@ var lostCommand = new Command("lost", "Count the amount of games lost against th
 var redLostOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games lost by the red team.");
 var blueLostOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games lost by the blue team.");
 lostCommand.AddOptions(redLostOption, blueLostOption);
-lostCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, bool redLost, bool blueLost) => app.WonOrLost(GameResult.Lost)(players, auth, team, from, to, undecided, redLost, blueLost), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, redLostOption, blueLostOption);
+lostCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, string stadium, bool redLost, bool blueLost) => app.WonOrLost(GameResult.Lost)(players, auth, team, from, to, undecided, stadium, redLost, blueLost), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption, redLostOption, blueLostOption);
 #endregion
 
 gamesCommand.Add(wonCommand);
