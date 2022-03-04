@@ -60,7 +60,7 @@ var preFilterTeamOption = new Option<bool>(new[] { "--team", "-t" }, () => false
 var preFilterFromOption = new Option<DateTime>("--from", () => DateTime.MinValue, "Only count games played since the give time.");
 var preFilterToOption = new Option<DateTime>("--to", () => DateTime.MaxValue, "Only count games played until the given time.");
 var preFilterUndecidedOption = new Option<bool>(new[] { "--undecided", "-u" }, () => false, "Include undecided games.");
-var preFilterStadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact matches.");
+var preFilterStadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact case-sensitive matches.");
 queryCommand.AddOptions(preFilterPlayersOption, preFilterAuthOption, preFilterTeamOption, preFilterFromOption, preFilterToOption, preFilterUndecidedOption, preFilterStadiumOption);
 
 QueryFilter GetPreFilter(ParseResult parseResult)
@@ -86,7 +86,7 @@ var teamOption = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look f
 var fromOption = new Option<DateTime>("--from", () => DateTime.MinValue, "Only count games played since the give time.");
 var toOption = new Option<DateTime>("--to", () => DateTime.MaxValue, "Only count games played until the given time.");
 var undecidedOption = new Option<bool>(new[] { "--undecided", "-u" }, () => false, "Include undecided games.");
-var stadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact matches.");
+var stadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact case-sensitive matches.");
 var queryFilterBinder = new QueryFilterBinder(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
 
 gamesCommand.AddGlobalOptions(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
