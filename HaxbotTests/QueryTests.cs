@@ -1,6 +1,5 @@
 ﻿using Haxbot;
 using Haxbot.Entities;
-using Haxbot.Settings;
 using NUnit.Framework;
 using System;
 using System.Linq;

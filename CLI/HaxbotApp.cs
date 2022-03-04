@@ -61,29 +61,33 @@ public class HaxbotApp
     }
 
     private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, QueryFilter filter)
+        => FilterByOptions(context, filter, context.Games!);
+
+    private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, QueryFilter filter, IQueryable<Game> games)
     {
         var playersInDb = filter.Players.Any()
             ? filter.Auth
                 ? context.Players!.ByAuth(filter.Players)
                 : context.Players!.ByName(filter.Players)
             : context.Players!;
-        var gamesByUndecided = context.Games!.Where(game => filter.Undecided || game.State != GameState.Undecided);
+        var gamesByUndecided = games.Where(game => filter.Undecided || game.State != GameState.Undecided);
         var gamesByTime = gamesByUndecided.Between(filter.From, filter.To);
         var gamesByPlayers = filter.Team ? gamesByTime.WithTeam(playersInDb) : gamesByTime.WithAny(playersInDb);
         var gamesByStadium = gamesByPlayers.PlayedOn(filter.Stadium);
         return (gamesByStadium, playersInDb);
     }
 
-    public void Games(QueryFilter filter)
+    public void Games(QueryFilter preFilter, QueryFilter filter)
     {
         using var context = new HaxbotContext(Configuration);
-        var totalGames = context.Games!.Count(game => filter.Undecided || game.State != GameState.Undecided);
+        var (preFiltered, _) = FilterByOptions(context, preFilter);
+        var totalGames = preFiltered.Count();
         if (totalGames == 0)
         {
             Console.WriteLine("0/0 (0%)");
             return;
         }
-        var (games, _) = FilterByOptions(context, filter);
+        var (games, _) = FilterByOptions(context, filter, preFiltered);
         var amount = games.Count();
         Console.WriteLine($"{amount}/{totalGames} ({Math.Round(decimal.Divide(amount, totalGames) * 100, 2)}%)");
     }

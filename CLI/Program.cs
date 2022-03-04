@@ -53,7 +53,32 @@ createCommand.SetHandler((string? token, bool headless) => app.CreateRoom(token,
 #endregion
 
 #region Query
-var queryCommand = new Command("query", "Query the database");
+var queryCommand = new Command("query", "Query the database. Can append options to this command to pre-filter the set of games queried in subsequent commands.");
+var preFilterPlayersOption = new Option<string[]>(new[] { "--players", "-p" }, "Look for games where any of these players participated.") { Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
+var preFilterAuthOption = new Option<bool>(new[] { "--auth", "-a" }, () => false, "Look for public Auth instead of name. See https://www.haxball.com/playerauth");
+var preFilterTeamOption = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look for games where all of the given players were in one team.");
+var preFilterFromOption = new Option<DateTime>("--from", () => DateTime.MinValue, "Only count games played since the give time.");
+var preFilterToOption = new Option<DateTime>("--to", () => DateTime.MaxValue, "Only count games played until the given time.");
+var preFilterUndecidedOption = new Option<bool>(new[] { "--undecided", "-u" }, () => false, "Include undecided games.");
+var preFilterStadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact matches.");
+queryCommand.AddOptions(preFilterPlayersOption, preFilterAuthOption, preFilterTeamOption, preFilterFromOption, preFilterToOption, preFilterUndecidedOption, preFilterStadiumOption);
+
+QueryFilter GetPreFilter(ParseResult parseResult)
+{
+    return new QueryFilter
+    {
+        Players = parseResult.GetValueForOption(preFilterPlayersOption),
+        Auth = parseResult.GetValueForOption(preFilterAuthOption),
+        Team = parseResult.GetValueForOption(preFilterTeamOption),
+        From = parseResult.GetValueForOption(preFilterFromOption),
+        To = parseResult.GetValueForOption(preFilterToOption),
+        Undecided = parseResult.GetValueForOption(preFilterUndecidedOption),
+        Stadium = parseResult.GetValueForOption<string>(preFilterStadiumOption)
+    };
+}
+
+#region Games
+var gamesCommand = new Command("games", "Query for games. Returns amount of games played against the total amount of games.");
 
 var playersOption = new Option<string[]>(new[] { "--players", "-p" }, "Look for games where any of these players participated.") { Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
 var authOption = new Option<bool>(new[] { "--auth", "-a" }, () => false, "Look for public Auth instead of name. See https://www.haxball.com/playerauth");
@@ -64,17 +89,19 @@ var undecidedOption = new Option<bool>(new[] { "--undecided", "-u" }, () => fals
 var stadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact matches.");
 var queryFilterBinder = new QueryFilterBinder(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
 
-#region Games
-var gamesCommand = new Command("games", "Query for games. Returns amount of games played against the total amount of games.");
 gamesCommand.AddGlobalOptions(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
-gamesCommand.SetHandler((QueryFilter filter) => app.Games(filter), queryFilterBinder);
+gamesCommand.SetHandler((QueryFilter filter, ParseResult parseResult) => 
+{
+    var preFilter = GetPreFilter(parseResult);
+    app.Games(preFilter, filter);
+}, queryFilterBinder);
 
 #region Won
 var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
 var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
 var blueWonOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games won by the blue team.");
 wonCommand.AddOptions(redWonOption, blueWonOption);
-wonCommand.SetHandler((QueryFilter filter, bool redWon, bool blueWon) => app.WonOrLost(GameResult.Won)(filter, redWon, blueWon), queryFilterBinder, redWonOption, blueWonOption);
+wonCommand.SetHandler((QueryFilter filter, bool redWon, bool blueWon, ParseResult parseResult) => app.WonOrLost(GameResult.Won)(filter, redWon, blueWon), queryFilterBinder, redWonOption, blueWonOption);
 #endregion
 
 #region Lost
@@ -82,7 +109,7 @@ var lostCommand = new Command("lost", "Count the amount of games lost against th
 var redLostOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games lost by the red team.");
 var blueLostOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games lost by the blue team.");
 lostCommand.AddOptions(redLostOption, blueLostOption);
-lostCommand.SetHandler((QueryFilter filter, bool redLost, bool blueLost) => app.WonOrLost(GameResult.Lost)(filter, redLost, blueLost), queryFilterBinder, redLostOption, blueLostOption);
+lostCommand.SetHandler((QueryFilter filter, bool redLost, bool blueLost, ParseResult parseResult) => app.WonOrLost(GameResult.Lost)(filter, redLost, blueLost), queryFilterBinder, redLostOption, blueLostOption);
 #endregion
 
 gamesCommand.Add(wonCommand);

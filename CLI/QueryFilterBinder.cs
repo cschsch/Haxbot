@@ -1,5 +1,4 @@
-﻿using CLI;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Binding;
 
 namespace CLI;
