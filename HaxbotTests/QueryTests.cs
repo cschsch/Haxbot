@@ -572,4 +572,17 @@ public class QueryTests
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);
     }
+
+    [Test]
+    public void PlayedOn_LowerCase_IsGame()
+    {
+        // arrange
+        var game = new Game { Stadium = "Futsal" };
+
+        // act
+        var result = new[] { game }.AsQueryable().PlayedOn("futsal");
+
+        // assert
+        CollectionAssert.AreEqual(new[] { game }, result);
+    }
 }

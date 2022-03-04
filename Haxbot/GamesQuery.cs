@@ -43,5 +43,5 @@ public static class GamesQuery
     }
 
     public static IQueryable<Game> PlayedOn(this IQueryable<Game> games, string stadium) => 
-        games.Where(game => game.Stadium.Contains(stadium));
+        games.Where(game => game.Stadium.Contains(stadium, StringComparison.OrdinalIgnoreCase));
 }
