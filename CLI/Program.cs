@@ -55,8 +55,6 @@ createCommand.SetHandler((string? token, bool headless) => app.CreateRoom(token,
 #region Query
 var queryCommand = new Command("query", "Query the database");
 
-#region Games
-var gamesCommand = new Command("games", "Query for games. Returns amount of games played against the total amount of games.");
 var playersOption = new Option<string[]>(new[] { "--players", "-p" }, "Look for games where any of these players participated.") { Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
 var authOption = new Option<bool>(new[] { "--auth", "-a" }, () => false, "Look for public Auth instead of name. See https://www.haxball.com/playerauth");
 var teamOption = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look for games where all of the given players were in one team.");
@@ -64,15 +62,19 @@ var fromOption = new Option<DateTime>("--from", () => DateTime.MinValue, "Only c
 var toOption = new Option<DateTime>("--to", () => DateTime.MaxValue, "Only count games played until the given time.");
 var undecidedOption = new Option<bool>(new[] { "--undecided", "-u" }, () => false, "Include undecided games.");
 var stadiumOption = new Option<string>(new[] { "--stadium", "-s" }, () => string.Empty, "Look for games played on given stadium. Returns non-exact matches.");
+var queryFilterBinder = new QueryFilterBinder(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
+
+#region Games
+var gamesCommand = new Command("games", "Query for games. Returns amount of games played against the total amount of games.");
 gamesCommand.AddGlobalOptions(playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
-gamesCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, string stadium) => app.Games(players, auth, team, from, to, undecided, stadium), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption);
+gamesCommand.SetHandler((QueryFilter filter) => app.Games(filter), queryFilterBinder);
 
 #region Won
 var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
 var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
 var blueWonOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games won by the blue team.");
 wonCommand.AddOptions(redWonOption, blueWonOption);
-wonCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, string stadium, bool redWon, bool blueWon) => app.WonOrLost(GameResult.Won)(players, auth, team, from, to, undecided, stadium, redWon, blueWon), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption, redWonOption, blueWonOption);
+wonCommand.SetHandler((QueryFilter filter, bool redWon, bool blueWon) => app.WonOrLost(GameResult.Won)(filter, redWon, blueWon), queryFilterBinder, redWonOption, blueWonOption);
 #endregion
 
 #region Lost
@@ -80,7 +82,7 @@ var lostCommand = new Command("lost", "Count the amount of games lost against th
 var redLostOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games lost by the red team.");
 var blueLostOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games lost by the blue team.");
 lostCommand.AddOptions(redLostOption, blueLostOption);
-lostCommand.SetHandler((string[] players, bool auth, bool team, DateTime from, DateTime to, bool undecided, string stadium, bool redLost, bool blueLost) => app.WonOrLost(GameResult.Lost)(players, auth, team, from, to, undecided, stadium, redLost, blueLost), playersOption, authOption, teamOption, fromOption, toOption, undecidedOption, stadiumOption, redLostOption, blueLostOption);
+lostCommand.SetHandler((QueryFilter filter, bool redLost, bool blueLost) => app.WonOrLost(GameResult.Lost)(filter, redLost, blueLost), queryFilterBinder, redLostOption, blueLostOption);
 #endregion
 
 gamesCommand.Add(wonCommand);
