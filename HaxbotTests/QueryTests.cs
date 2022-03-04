@@ -573,7 +573,7 @@ public class QueryTests
     }
 
     [Test]
-    public void PlayedOn_LowerCase_IsGame()
+    public void PlayedOn_LowerCase_IsEmpty()
     {
         // arrange
         var game = new Game { Stadium = "Futsal" };
@@ -582,6 +582,6 @@ public class QueryTests
         var result = new[] { game }.AsQueryable().PlayedOn("futsal");
 
         // assert
-        CollectionAssert.AreEqual(new[] { game }, result);
+        CollectionAssert.IsEmpty(result);
     }
 }
