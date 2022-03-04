@@ -53,7 +53,7 @@ createCommand.SetHandler((string? token, bool headless) => app.CreateRoom(token,
 #endregion
 
 #region Query
-var queryCommand = new Command("query", "Query the database. Can append options to this command to pre-filter the set of games queried in subsequent commands.");
+var queryCommand = new Command("query", "Query the database. You can append options to this command to pre-filter the set of games queried in subsequent commands.");
 var preFilterPlayersOption = new Option<string[]>(new[] { "--players", "-p" }, "Look for games where any of these players participated.") { Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
 var preFilterAuthOption = new Option<bool>(new[] { "--auth", "-a" }, () => false, "Look for public Auth instead of name. See https://www.haxball.com/playerauth");
 var preFilterTeamOption = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look for games where all of the given players were in one team.");
