@@ -37,7 +37,7 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
     {
         var red = new Team();
         var blue = new Team();
-        CurrentGame = new Game { Red = red, Blue = blue, State = GameState.Undecided };
+        CurrentGame = new Game { Red = red, Blue = blue, State = GameState.Undecided, Stadium = CurrentGame.Stadium };
         
         foreach (var player in players.Where(player => player.Team != TeamId.Spectators))
         {
