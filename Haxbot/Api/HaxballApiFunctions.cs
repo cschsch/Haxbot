@@ -1,4 +1,5 @@
 ﻿using Haxbot.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Haxbot.Api;
 
@@ -35,17 +36,28 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
 
     public bool StartGame(HaxballPlayer[] players)
     {
-        var red = new Team();
-        var blue = new Team();
-        CurrentGame = new Game { Red = red, Blue = blue, State = GameState.Undecided, Stadium = CurrentGame.Stadium };
-        
-        foreach (var player in players.Where(player => player.Team != TeamId.Spectators))
+        CurrentGame = new Game { State = GameState.Undecided, Stadium = CurrentGame.Stadium };
+
+        var mappedTeamPlayers = players
+            .Where(player => player.Team != TeamId.Spectators)
+            .GroupBy(player => player.Team)
+            .ToDictionary(team => team.Key, team => team
+                .Select(player => Context.Players!
+                    .SingleOrDefault(p => player.Auth == p.Auth) ?? new Player(player.Name, player.Auth))
+                .OrderBy(player => player.Name));
+
+        foreach (var teamPlayers in mappedTeamPlayers)
         {
-            var mappedPlayer = Context.Players!.SingleOrDefault(p => player.Auth == p.Auth) ?? new Player(player.Name, player.Auth);
-            switch (player.Team)
+            var team = Context.Teams!.Include(team => team.Players)
+                    .AsEnumerable()
+                    .SingleOrDefault(team => team.Players
+                        .OrderBy(player => player.Name)
+                        .SequenceEqual(teamPlayers.Value))
+                    ?? new Team { Players = new List<Player>(teamPlayers.Value) };
+            switch (teamPlayers.Key)
             {
-                case TeamId.Red: red.Players.Add(mappedPlayer); break;
-                case TeamId.Blue: blue.Players.Add(mappedPlayer); break;
+                case TeamId.Red: CurrentGame.Red = team; break;
+                case TeamId.Blue: CurrentGame.Blue = team; break;
             }
         }
 

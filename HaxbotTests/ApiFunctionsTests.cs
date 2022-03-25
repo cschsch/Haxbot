@@ -62,7 +62,7 @@ public class ApiFunctionsTests
         // arrange
         var games = new List<Game>();
         var playersInDb = new List<Player> { new Player { Auth = "auth", Id = Guid.NewGuid() } };
-        var context = new Mock<HaxbotContext>(Configuration).Add(games).Add(playersInDb);
+        var context = new Mock<HaxbotContext>(Configuration).Add(games).Add(new List<Team>()).Add(playersInDb);
         var functions = new HaxballApiFunctions(context.Object);
         var players = new[] { new HaxballPlayer { Auth = playersInDb.Single().Auth, Team = TeamId.Red } };
 
@@ -80,7 +80,7 @@ public class ApiFunctionsTests
     {
         // arrange
         var games = new List<Game>();
-        var context = new Mock<HaxbotContext>(Configuration).Add(games).Add(new List<Player>());
+        var context = new Mock<HaxbotContext>(Configuration).Add(games).Add(new List<Team>()).Add(new List<Player>());
         var functions = new HaxballApiFunctions(context.Object);
 
         var peter = new HaxballPlayer { Name = "peter", Auth = "1", Team = TeamId.Red };
