@@ -1,5 +1,4 @@
-﻿using CLI;
-using CLI.Stats;
+﻿using CLI.Stats;
 using Haxbot.Entities;
 using NUnit.Framework;
 using System.Collections.Concurrent;

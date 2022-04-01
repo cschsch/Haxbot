@@ -1,7 +1,4 @@
-﻿using Haxbot.Api;
-using Haxbot.Entities;
-
-namespace CLI.Stats;
+﻿namespace CLI.Stats;
 
 public record GameStats
 {

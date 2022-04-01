@@ -17,7 +17,6 @@ public class StatsPrinter
         if (ByTeam) statsCollectors.Add(new TeamStatsCollector());
         if (ByStadium) statsCollectors.Add(new StadiumStatsCollector<PlayerStatsCollector>());
         if (ByDay) statsCollectors.Add(new DayStatsCollector<PlayerStatsCollector>());
-        statsCollectors.Add(new DayStatsCollector<StadiumStatsCollector<PlayerStatsCollector>>());
 
         Parallel.ForEach(games, game => statsCollectors.ForEach(statsCollector => statsCollector.Register(game, players)));
 
