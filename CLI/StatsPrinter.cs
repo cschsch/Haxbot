@@ -19,6 +19,7 @@ public class StatsPrinter
             .Where(type => type.Namespace == "CLI.Stats" && !type.IsAbstract && !type.IsInterface && type.Name.Contains("StatsCollector"))
             .ToArray();
         var completeCollectorType = Groupings
+            .Distinct()
             .Select(grouping => collectorTypes.Single(type => type.Name.StartsWith(grouping.ToString())))
             .Reverse()
             .Aggregate((acc, cur) => cur.MakeGenericType(acc));
