@@ -99,16 +99,26 @@ public class HaxbotApp
         return (filter, red, blue) =>
         {
             using var context = new HaxbotContext(Configuration);
-            var (games, playersInDb) = FilterByOptions(context, filter);
+            var (games, players) = FilterByOptions(context, filter);
             var filteredGames = games.Include(game => game.Red.Players).Include(game => game.Blue.Players).ToArray();
             if (filteredGames.Length == 0)
             {
                 Console.WriteLine("0/0 (0%)");
                 return;
             }
-            var gamesByState = result == GameResult.Won ? filteredGames.WonBy(playersInDb, red, blue) : filteredGames.LostBy(playersInDb, red, blue);
+            var gamesByState = result == GameResult.Won ? filteredGames.WonBy(players, red, blue) : filteredGames.LostBy(players, red, blue);
             var amount = gamesByState.Count();
             Console.WriteLine($"{amount}/{filteredGames.Length} ({Math.Round(decimal.Divide(amount, filteredGames.Length) * 100, 2)}%)");
         };
+    }
+
+    public void Overview(QueryFilter filter, StatsPrinter collector)
+    {
+        using var context = new HaxbotContext(Configuration);
+        var (dbGames, dbPlayers) = FilterByOptions(context, filter);
+        var games = dbGames.Include(game => game.Red.Players).Include(game => game.Blue.Players).ToArray();
+        var players = dbPlayers.ToArray();
+
+        collector.PrintStats(games, players);
     }
 }

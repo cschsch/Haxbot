@@ -1,4 +1,5 @@
 ﻿using CLI;
+using CLI.Extensions;
 using Haxbot.Settings;
 using Microsoft.Extensions.Configuration;
 using System.CommandLine;
@@ -96,6 +97,17 @@ gamesCommand.SetHandler((QueryFilter filter, ParseResult parseResult) =>
     app.Games(preFilter, filter);
 }, queryFilterBinder);
 
+#region Overview
+var overviewCommand = new Command("overview", "Prints an overview for each of the given options.");
+var byPlayerOption = new Option<bool>(new[] { "--by-player" }, () => true, "Group by player");
+var byTeamOption = new Option<bool>(new[] { "--by-team" }, () => false, "Group by team");
+var byStadiumOption = new Option<bool>(new[] { "--by-stadium" }, () => false, "Group by stadium");
+var byDayOption = new Option<bool>(new[] { "--by-day" }, () => false, "Group by day");
+var statCollectorBinder = new StatsPrinterBinder(byPlayerOption, byTeamOption, byStadiumOption, byDayOption);
+overviewCommand.AddOptions(byPlayerOption, byTeamOption, byStadiumOption, byDayOption);
+overviewCommand.SetHandler((QueryFilter filter, StatsPrinter collector) => app.Overview(filter, collector), queryFilterBinder, statCollectorBinder);
+#endregion
+
 #region Won
 var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
 var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
@@ -112,6 +124,7 @@ lostCommand.AddOptions(redLostOption, blueLostOption);
 lostCommand.SetHandler((QueryFilter filter, bool redLost, bool blueLost, ParseResult parseResult) => app.WonOrLost(GameResult.Lost)(filter, redLost, blueLost), queryFilterBinder, redLostOption, blueLostOption);
 #endregion
 
+gamesCommand.Add(overviewCommand);
 gamesCommand.Add(wonCommand);
 gamesCommand.Add(lostCommand);
 #endregion
