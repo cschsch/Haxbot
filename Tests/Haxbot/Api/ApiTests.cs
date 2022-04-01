@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HaxbotTests.Haxbot.Api;
+namespace Tests.Haxbot.Api;
 
 [Parallelizable(ParallelScope.All)]
 public class ApiTests

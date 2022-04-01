@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace HaxbotTests.Haxbot.Api;
+namespace Tests.Haxbot.Api;
 
 [Parallelizable(ParallelScope.All)]
 public class ApiFunctionsTests
