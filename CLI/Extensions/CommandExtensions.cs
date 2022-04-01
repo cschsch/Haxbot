@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 
-namespace CLI;
+namespace CLI.Extensions;
 
 public static class CommandExtensions
 {
