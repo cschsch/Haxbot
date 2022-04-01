@@ -1,27 +1,35 @@
 ﻿using CLI.Stats;
 using Haxbot.Entities;
+using System.Reflection;
 
 namespace CLI;
 
 public class StatsPrinter
 {
-    public bool ByPlayer { get; init; }
-    public bool ByTeam { get; init; }
-    public bool ByStadium { get; init; }
-    public bool ByDay { get; init; }
+    public static Grouping[] ResultGroupings { get; } = new Grouping[] { Grouping.Player, Grouping.Team };
+    public Grouping[] Groupings { get; init; } = Array.Empty<Grouping>();
+
+    private IStatsCollector GetCollector()
+    {
+        if (!ResultGroupings.Contains(Groupings.Last())) throw new ArgumentException("Last Grouping needs to be of a result collector");
+        if (Groupings.Count(ResultGroupings.Contains) > 1) throw new ArgumentException("There can only be one result collector");
+
+        var collectorTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(type => type.Namespace == "CLI.Stats" && !type.IsAbstract && !type.IsInterface && type.Name.Contains("StatsCollector"))
+            .ToArray();
+        var completeCollectorType = Groupings
+            .Select(grouping => collectorTypes.Single(type => type.Name.StartsWith(grouping.ToString())))
+            .Reverse()
+            .Aggregate((acc, cur) => cur.MakeGenericType(acc));
+        return (IStatsCollector) Activator.CreateInstance(completeCollectorType)!;
+    }
 
     public void PrintStats(ICollection<Game> games, ICollection<Player> players)
     {
-        var statsCollectors = new List<IStatsCollector>();
-        if (ByPlayer) statsCollectors.Add(new PlayerStatsCollector());
-        if (ByTeam) statsCollectors.Add(new TeamStatsCollector());
-        if (ByStadium) statsCollectors.Add(new StadiumStatsCollector<PlayerStatsCollector>());
-        if (ByDay) statsCollectors.Add(new DayStatsCollector<PlayerStatsCollector>());
-
-        Parallel.ForEach(games, game => statsCollectors.ForEach(statsCollector => statsCollector.Register(game, players)));
-
-        var tables = statsCollectors.Select(statsCollector => statsCollector.FormatTable());
-        var result = string.Join(Environment.NewLine + Environment.NewLine, tables);
+        var collector = GetCollector();
+        Parallel.ForEach(games, game => collector.Register(game, players));
+        var result = collector.FormatTable();
         Console.WriteLine(result);
     }
 }

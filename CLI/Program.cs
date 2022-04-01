@@ -99,12 +99,19 @@ gamesCommand.SetHandler((QueryFilter filter, ParseResult parseResult) =>
 
 #region Overview
 var overviewCommand = new Command("overview", "Prints an overview for each of the given options.");
-var byPlayerOption = new Option<bool>(new[] { "--by-player" }, () => true, "Group by player");
-var byTeamOption = new Option<bool>(new[] { "--by-team" }, () => false, "Group by team");
-var byStadiumOption = new Option<bool>(new[] { "--by-stadium" }, () => false, "Group by stadium");
-var byDayOption = new Option<bool>(new[] { "--by-day" }, () => false, "Group by day");
-var statCollectorBinder = new StatsPrinterBinder(byPlayerOption, byTeamOption, byStadiumOption, byDayOption);
-overviewCommand.AddOptions(byPlayerOption, byTeamOption, byStadiumOption, byDayOption);
+var resultGroupingsNames = StatsPrinter.ResultGroupings.Select(grouping => grouping.ToString());
+var groupingsArgument = new Argument<Grouping[]>("Groupings", () => new[] { Grouping.Player },
+$@"Groupings to apply before counting results
+
+Possible Groupings -> {string.Join(", ", Enum.GetNames(typeof(Grouping)).Except(resultGroupingsNames))}
+
+Last value needs to be a result grouping, of which there can only be one.
+
+Result Groupings -> {string.Join(", ", resultGroupingsNames)}
+
+");
+var statCollectorBinder = new StatsPrinterBinder(groupingsArgument);
+overviewCommand.AddArgument(groupingsArgument);
 overviewCommand.SetHandler((QueryFilter filter, StatsPrinter collector) => app.Overview(filter, collector), queryFilterBinder, statCollectorBinder);
 #endregion
 
