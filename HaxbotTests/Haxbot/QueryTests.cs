@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 
-namespace HaxbotTests;
+namespace HaxbotTests.Haxbot;
 
 [Parallelizable(ParallelScope.All)]
 public class QueryTests
