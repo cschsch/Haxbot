@@ -1,9 +1,6 @@
-﻿using CLI;
-using CLI.Extensions;
-using Haxbot.Settings;
+﻿using Haxbot.Settings;
 using Microsoft.Extensions.Configuration;
 using System.CommandLine;
-using System.CommandLine.Binding;
 using System.CommandLine.Parsing;
 
 namespace CLI;

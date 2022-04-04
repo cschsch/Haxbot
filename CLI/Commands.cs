@@ -2,7 +2,6 @@
 using Haxbot.Settings;
 using System.CommandLine;
 using System.CommandLine.Binding;
-using System.CommandLine.Parsing;
 
 namespace CLI;
 
