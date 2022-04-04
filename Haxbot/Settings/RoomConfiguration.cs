@@ -7,5 +7,5 @@ public record RoomConfiguration
     public bool Public { get; init; }
     public bool NoPlayer { get; init; } = true;
     public string PlayerName { get; init; } = "Haxbot";
-    public int TimeLimit { get; init; } = 300;
+    public int TimeLimit { get; init; } = 5;
 }
