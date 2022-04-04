@@ -1,4 +1,5 @@
-﻿using CLI.Stats;
+﻿using CLI.Commands;
+using CLI.Stats;
 using Haxbot.Entities;
 using System.Reflection;
 

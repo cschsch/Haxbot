@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.CommandLine;
 
-namespace CLI;
+namespace CLI.Commands;
 
 public class CommandNode : IEnumerable<CommandNode>
 {

@@ -1,36 +1,31 @@
-﻿using Haxbot.Settings;
+﻿using CLI.Commands;
+using Haxbot.Settings;
 using Microsoft.Extensions.Configuration;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 
 namespace CLI;
 
-public partial class Program
+public class Program
 {
-    private Configuration GetConfiguration(string[] args) => new ConfigurationBuilder()
+    private static Configuration GetConfiguration(string[] args) => new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
         .AddCommandLine(args,
-            MainSwitches
-            .Concat(CreateRoomSwitches)
+            CommandSwitches.RootSwitches
+            .Concat(CommandSwitches.CreateRoomSwitches)
             .SelectMany(nameSwitches => nameSwitches.Value.Select(@switch => new KeyValuePair<string, string>(@switch, nameSwitches.Key)))
             .ToDictionary(kv => kv.Key, kv => kv.Value))
         .Build()
         .Get<Configuration>();
 
-    static void Main(string[] args)
-    {
-        var program = new Program();
-        program.Execute(args);
-    }
-
-    public void Execute(string[] args)
+    public static void Main(string[] args)
     {
         var configuration = GetConfiguration(args);
 
         var app = new HaxbotApp(configuration);
 
-        var rootCommand = GetRootCommand(configuration);
-        var createCommand = GetCreateCommand(configuration, app);
+        var rootCommand = CommandFactories.GetRootCommand(configuration);
+        var createCommand = CommandFactories.GetCreateCommand(configuration, app);
 
         var mainQueryCommand = new QueryCommand();
         var queryCommand = mainQueryCommand.GetCommand("query", "Query the database. You can append options to this command to pre-filter the set of games queried in subsequent commands.");
@@ -39,11 +34,11 @@ public partial class Program
         var gamesCommand = mainGamesCommand.GetCommand("games", "Query for games. Returns amount of games played against the total amount of games.", true);
         gamesCommand.SetHandler((QueryFilter preFilter, QueryFilter filter) => app.Games(preFilter, filter), mainQueryCommand, mainGamesCommand);
 
-        var overviewCommand = GetOverviewCommand(app, mainGamesCommand);
-        var standardCommand = GetStandardCommand(configuration);
+        var overviewCommand = CommandFactories.GetOverviewCommand(app, mainGamesCommand);
+        var standardCommand = CommandFactories.GetStandardCommand(configuration, Main);
 
-        var wonCommand = GetWonOrLostCommand(app, mainGamesCommand, GameResult.Won);
-        var lostCommand = GetWonOrLostCommand(app, mainGamesCommand, GameResult.Lost);
+        var wonCommand = CommandFactories.GetWonOrLostCommand(app, mainGamesCommand, GameResult.Won);
+        var lostCommand = CommandFactories.GetWonOrLostCommand(app, mainGamesCommand, GameResult.Lost);
 
         var commandHierarchy = new CommandNode(rootCommand)
         {

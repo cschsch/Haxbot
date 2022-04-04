@@ -1,4 +1,6 @@
-﻿namespace CLI.Stats;
+﻿using CLI.Commands;
+
+namespace CLI.Stats;
 
 public record GameStats
 {

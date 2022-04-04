@@ -1,4 +1,5 @@
-﻿using Haxbot.Api;
+﻿using CLI.Commands;
+using Haxbot.Api;
 using Haxbot.Entities;
 
 namespace CLI.Extensions;

@@ -2,7 +2,7 @@
 using System.CommandLine;
 using System.CommandLine.Binding;
 
-namespace CLI;
+namespace CLI.Commands;
 
 public class QueryCommand : BinderBase<QueryFilter>
 {

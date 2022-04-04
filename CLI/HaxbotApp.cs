@@ -1,4 +1,5 @@
-﻿using Haxbot;
+﻿using CLI.Commands;
+using Haxbot;
 using Haxbot.Api;
 using Haxbot.Entities;
 using Haxbot.Settings;
@@ -23,7 +24,7 @@ public class HaxbotApp
 
     public async Task CreateRoom(string? token, bool headless)
     {
-        if (string.IsNullOrWhiteSpace(token) && headless) throw new ArgumentException("token cannot be empty in headless mode!");
+        if (string.IsNullOrWhiteSpace(token) && headless) throw new ArgumentException("Token cannot be empty in headless mode!");
 
         var cancellationTokenSource = new CancellationTokenSource();
 
@@ -94,7 +95,7 @@ public class HaxbotApp
 
     public Action<QueryFilter, bool, bool> WonOrLost(GameResult result)
     {
-        if (result == GameResult.Default) throw new ArgumentException("No distinction between games won and lost", nameof(result));
+        if (result == GameResult.Default) throw new ArgumentException("No distinction between games won and lost!", nameof(result));
 
         return (filter, red, blue) =>
         {

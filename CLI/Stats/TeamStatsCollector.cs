@@ -1,4 +1,5 @@
-﻿using CLI.Extensions;
+﻿using CLI.Commands;
+using CLI.Extensions;
 using Haxbot.Api;
 using Haxbot.Entities;
 using System.Collections.Concurrent;

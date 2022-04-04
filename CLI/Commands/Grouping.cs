@@ -1,4 +1,4 @@
-﻿namespace CLI;
+﻿namespace CLI.Commands;
 
 public enum Grouping
 {

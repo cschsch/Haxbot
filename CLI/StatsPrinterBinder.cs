@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using CLI.Commands;
+using System.CommandLine;
 using System.CommandLine.Binding;
 
 namespace CLI;
@@ -16,7 +17,7 @@ public class StatsPrinterBinder : BinderBase<StatsPrinter>
     {
         return new StatsPrinter
         {
-            Groupings = bindingContext.ParseResult.GetValueForArgument( _groupings)
+            Groupings = bindingContext.ParseResult.GetValueForArgument(_groupings)
         };
     }
 }

@@ -2,6 +2,7 @@
 using Haxbot.Api;
 using Haxbot.Entities;
 using System.Collections.Concurrent;
+using CLI.Commands;
 
 namespace CLI.Stats;
 
