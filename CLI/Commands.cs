@@ -71,7 +71,25 @@ Result Groupings -> {string.Join(", ", resultGroupingsNames)}
         return overviewCommand;
     }
 
-    Command GetWonCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
+    private Command GetStandardCommand(Configuration configuration)
+    {
+        var standardCommand = new Command("standard", "Execute standard overview commands as specified in configuration. Commands will be formatted with current date.");
+        standardCommand.SetHandler(() =>
+        {
+            foreach (var command in configuration.StandardOverviewCommands
+                .Where(command => command.Contains("overview"))
+                .Select(command => string.Format(command, new [] { DateTime.Today.ToShortDateString() })))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(command + Environment.NewLine);
+                Console.ResetColor();
+                Execute(command.Split(" "));
+            }
+        });
+        return standardCommand;
+    }
+
+    private Command GetWonCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
     {
         var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
         var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
@@ -81,7 +99,7 @@ Result Groupings -> {string.Join(", ", resultGroupingsNames)}
         return wonCommand;
     }
 
-    Command GetLostCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
+    private Command GetLostCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
     {
         var lostCommand = new Command("lost", "Count the amount of games lost against the total amount of filtered games.");
         var redLostOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games lost by the red team.");

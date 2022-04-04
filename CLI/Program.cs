@@ -48,6 +48,9 @@ public partial class Program
         var overviewCommand = GetOverviewCommand(app, mainGamesCommand);
         gamesCommand.Add(overviewCommand);
 
+        var standardCommand = GetStandardCommand(configuration);
+        overviewCommand.Add(standardCommand);
+
         var wonCommand = GetWonCommand(app, mainGamesCommand);
         gamesCommand.Add(wonCommand);
 
@@ -55,6 +58,6 @@ public partial class Program
         gamesCommand.Add(lostCommand);
 
         app.Init();
-        rootCommand.Invoke(Environment.GetCommandLineArgs());
+        rootCommand.Invoke(args);
     }
 }

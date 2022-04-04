@@ -11,6 +11,7 @@ public record Configuration
     public RoomConfiguration RoomConfiguration { get; init; }
     public string[] RoomAdmins { get; init; }
     public string BotOwner { get; init; }
+    public string[] StandardOverviewCommands { get; init; }
 
     [JsonIgnore]
     public string ConnectionString => string.Format(ConnectionStringTemplate, new[] { DatabasePath });
@@ -24,5 +25,14 @@ public record Configuration
         RoomConfiguration = new RoomConfiguration();
         RoomAdmins = Array.Empty<string>();
         BotOwner = string.Empty;
+        StandardOverviewCommands = new[] 
+        {
+            "query games --to {0} overview player",
+            "query games overview player",
+            "query games overview --to {0} team",
+            "query games overview team",
+            "query games overview stadium player",
+            "query games overview stadium team"
+        };
     }
 }
