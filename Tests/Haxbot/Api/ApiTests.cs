@@ -46,7 +46,9 @@ HBInit = roomConfiguration => {{
   const link = document.createElement('a');
   link.href = '{RoomUrl}';
   roomlink.appendChild(link);
-  return getRoomResult(roomConfiguration);
+  const room = getRoomResult(roomConfiguration);
+  room.setTimeLimit = () => {{}};
+  return room;
 }};");
         return page;
     }

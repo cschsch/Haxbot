@@ -26,6 +26,7 @@ public class HaxballApi
         await Page.EvaluateFunctionAsync(@"(roomConfig, token, admins) => {
     roomConfig.token = token;
     room = HBInit(roomConfig);
+    room.setTimeLimit(roomConfig.timeLimit);
     idAuths = [];
     room.onPlayerJoin = async function (player) {
         idAuths.push([player.id, player.auth]);
