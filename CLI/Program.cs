@@ -34,28 +34,37 @@ public partial class Program
 
         var rootCommand = GetRootCommand(configuration);
         var createCommand = GetCreateCommand(configuration, app);
-        rootCommand.Add(createCommand);
 
         var mainQueryCommand = new QueryCommand();
         var queryCommand = mainQueryCommand.GetCommand("query", "Query the database. You can append options to this command to pre-filter the set of games queried in subsequent commands.");
-        rootCommand.Add(queryCommand);
 
         var mainGamesCommand = new QueryCommand();
         var gamesCommand = mainGamesCommand.GetCommand("games", "Query for games. Returns amount of games played against the total amount of games.", true);
         gamesCommand.SetHandler((QueryFilter preFilter, QueryFilter filter) => app.Games(preFilter, filter), mainQueryCommand, mainGamesCommand);
-        queryCommand.Add(gamesCommand);
 
         var overviewCommand = GetOverviewCommand(app, mainGamesCommand);
-        gamesCommand.Add(overviewCommand);
-
         var standardCommand = GetStandardCommand(configuration);
-        overviewCommand.Add(standardCommand);
 
         var wonCommand = GetWonOrLostCommand(app, mainGamesCommand, GameResult.Won);
-        gamesCommand.Add(wonCommand);
-
         var lostCommand = GetWonOrLostCommand(app, mainGamesCommand, GameResult.Lost);
-        gamesCommand.Add(lostCommand);
+
+        var commandHierarchy = new CommandNode(rootCommand)
+        {
+            createCommand,
+            new(queryCommand)
+            {
+                new(gamesCommand)
+                {
+                    wonCommand,
+                    lostCommand,
+                    new(overviewCommand)
+                    {
+                        standardCommand
+                    }
+                }
+            }
+        };
+        commandHierarchy.InitializeCommand();
 
         app.Init();
         rootCommand.Invoke(args);
