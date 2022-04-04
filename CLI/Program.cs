@@ -51,10 +51,10 @@ public partial class Program
         var standardCommand = GetStandardCommand(configuration);
         overviewCommand.Add(standardCommand);
 
-        var wonCommand = GetWonCommand(app, mainGamesCommand);
+        var wonCommand = GetWonOrLostCommand(app, mainGamesCommand, GameResult.Won);
         gamesCommand.Add(wonCommand);
 
-        var lostCommand = GetLostCommand(app, mainGamesCommand);
+        var lostCommand = GetWonOrLostCommand(app, mainGamesCommand, GameResult.Lost);
         gamesCommand.Add(lostCommand);
 
         app.Init();

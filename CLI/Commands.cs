@@ -89,23 +89,19 @@ Result Groupings -> {string.Join(", ", resultGroupingsNames)}
         return standardCommand;
     }
 
-    private Command GetWonCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
+    private Command GetWonOrLostCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder, GameResult result)
     {
-        var wonCommand = new Command("won", "Count the amount of games won against the total amount of filtered games.");
-        var redWonOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
-        var blueWonOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games won by the blue team.");
-        wonCommand.AddOptions(redWonOption, blueWonOption);
-        wonCommand.SetHandler((QueryFilter filter, bool redWon, bool blueWon) => app.WonOrLost(GameResult.Won)(filter, redWon, blueWon), filterBinder, redWonOption, blueWonOption);
-        return wonCommand;
-    }
-
-    private Command GetLostCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
-    {
-        var lostCommand = new Command("lost", "Count the amount of games lost against the total amount of filtered games.");
-        var redLostOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games lost by the red team.");
-        var blueLostOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games lost by the blue team.");
-        lostCommand.AddOptions(redLostOption, blueLostOption);
-        lostCommand.SetHandler((QueryFilter filter, bool redLost, bool blueLost, ParseResult parseResult) => app.WonOrLost(GameResult.Lost)(filter, redLost, blueLost), filterBinder, redLostOption, blueLostOption);
-        return lostCommand;
+        var verb = result switch
+        {
+            GameResult.Won => "won",
+            GameResult.Lost => "lost",
+            _ => throw new ArgumentException("Result has to be Won or Lost", nameof(result))
+        };
+        var command = new Command(verb, $"Count the amount of games {verb} against the total amount of filtered games.");
+        var redOption = new Option<bool>(new[] { "--red", "-r" }, () => false, "Constrain to games won by the red team.");
+        var blueOption = new Option<bool>(new[] { "--blue", "-b" }, () => false, "Constrain to games won by the blue team.");
+        command.AddOptions(redOption, blueOption);
+        command.SetHandler((QueryFilter filter, bool redWon, bool blueWon) => app.WonOrLost(result)(filter, redWon, blueWon), filterBinder, redOption, blueOption);
+        return command;
     }
 }
