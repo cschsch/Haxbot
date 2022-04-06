@@ -28,17 +28,17 @@ public class Program
         var createCommand = CommandFactories.GetCreateCommand(configuration, app);
 
         var mainQueryCommand = new QueryCommand();
-        var queryCommand = mainQueryCommand.GetCommand("query", "Query the database. You can append options to this command to pre-filter the set of games queried in subsequent commands.");
+        var queryCommand = mainQueryCommand.GetCommand("query", "Query the database. You can append options to this command to pre-filter the set of games queried in subsequent commands.", true);
 
         var mainGamesCommand = new QueryCommand();
-        var gamesCommand = mainGamesCommand.GetCommand("games", "Query for games. Returns amount of games played against the total amount of games.", true);
+        var gamesCommand = mainGamesCommand.GetCommand("games", "Query for games. Returns amount of games played against the total amount of games.");
         gamesCommand.SetHandler((QueryFilter preFilter, QueryFilter filter) => app.Games(preFilter, filter), mainQueryCommand, mainGamesCommand);
 
-        var overviewCommand = CommandFactories.GetOverviewCommand(app, mainGamesCommand);
+        var overviewCommand = CommandFactories.GetOverviewCommand(app, mainQueryCommand);
         var standardCommand = CommandFactories.GetStandardCommand(configuration, Main);
 
-        var wonCommand = CommandFactories.GetWonOrLostCommand(app, mainGamesCommand, GameResult.Won);
-        var lostCommand = CommandFactories.GetWonOrLostCommand(app, mainGamesCommand, GameResult.Lost);
+        var wonCommand = CommandFactories.GetWonOrLostCommand(app, mainQueryCommand, GameResult.Won);
+        var lostCommand = CommandFactories.GetWonOrLostCommand(app, mainQueryCommand, GameResult.Lost);
 
         var commandHierarchy = new CommandNode(rootCommand)
         {
