@@ -190,6 +190,23 @@ public class ApiFunctionsTests
     }
 
     [Test]
+    public void SaveReplay_SetsReplay()
+    {
+        // arrange
+        var games = new List<Game>();
+        var context = new Mock<HaxbotContext>(Configuration).Add(games);
+        var functions = new HaxballApiFunctions(context.Object);
+
+        // act
+        functions.StartGame(Array.Empty<HaxballPlayer>());
+        functions.SaveReplay("QQ==");
+
+        // assert
+        var game = games.Single();
+        Assert.AreEqual("QQ==", game.Replay);
+    }
+
+    [Test]
     public void Dispose_DisposesContext()
     {
         // arrange

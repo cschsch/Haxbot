@@ -48,6 +48,7 @@ HBInit = roomConfiguration => {{
   roomlink.appendChild(link);
   const room = getRoomResult(roomConfiguration);
   room.setTimeLimit = () => {{}};
+  room.startRecording = () => {{}};
   return room;
 }};");
         return page;
@@ -230,5 +231,22 @@ HBInit = roomConfiguration => {{
 
         // assert
         Assert.AreEqual(expected, result);
+    }
+
+    [Test]
+    public async Task SaveReplay_EncodesToBase64()
+    {
+        // arrange
+        var expected = "QQ==";
+        var page = await SetUpPage("_ => { return { stopRecording: () => [65] }; }");
+        var functions = new Mock<IHaxballApiFunctions>();
+        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+
+        // act
+        await api.CreateRoomAsync();
+        await page.EvaluateExpressionAsync("room.onGameStop()");
+
+        // assert
+        functions.Verify(f => f.SaveReplay(expected));
     }
 }

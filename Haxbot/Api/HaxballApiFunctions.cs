@@ -11,6 +11,7 @@ public interface IHaxballApiFunctions
     void CloseRoom();
     void SetStadium(string stadium, HaxballPlayer player);
     string HandleCommand(HaxballPlayer player, string message);
+    void SaveReplay(string base64);
 }
 
 public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
@@ -96,6 +97,12 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
     public string HandleCommand(HaxballPlayer player, string message)
     {
         return message;
+    }
+
+    public void SaveReplay(string base64)
+    {
+        CurrentGame.Replay = base64;
+        Context.SaveChanges();
     }
 
     public void Dispose() => Context.Dispose();

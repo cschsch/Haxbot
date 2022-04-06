@@ -37,7 +37,11 @@ public class HaxballApi
     room.onGameStart = async function (byPlayer) {
         const players = room.getPlayerList();
         const couldStartGame = await startGame(players, idAuths);
-        if (couldStartGame) return;
+        if (couldStartGame) 
+        {
+            room.startRecording();
+            return;
+        }
         room.sendChat(`Failed to save game to database!`);
     };
     room.onTeamVictory = async function (scores) {
@@ -46,7 +50,7 @@ public class HaxballApi
         room.sendChat(`Failed to save results to database!`);
     };
     room.onPlayerLeave = async function (player) {
-        var players = room.getPlayerList();
+        const players = room.getPlayerList();
         if (players.length === 0 || (players.length === 1 && players[0].name === roomConfig.playerName)) {
             await closeRoom();
         }
@@ -58,6 +62,11 @@ public class HaxballApi
         const answer = await handleCommand(player, message);
         room.sendChat(answer);
     };
+    room.onGameStop = async function (byPlayer) {
+        const replay = room.stopRecording();
+        const base64 = btoa(String.fromCharCode.apply(null, replay));
+        await saveReplay(base64);
+    }
 }", Configuration.RoomConfiguration, Token, Configuration.RoomAdmins);
 
         return await Page
@@ -76,6 +85,7 @@ public class HaxballApi
         var exposeCloseRoom = Page.ExposeFunctionAsync("closeRoom", ApiFunctions.CloseRoom);
         var exposeSetStadium = Page.ExposeFunctionAsync<string, HaxballPlayer, object>("setStadium", (stadium, player) => { ApiFunctions.SetStadium(stadium, player); return default!; });
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
-        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeSetStadium, exposeHandleCommand);
+        var exposeSaveReplay = Page.ExposeFunctionAsync<string, object>("saveReplay", base64 => { ApiFunctions.SaveReplay(base64); return default!; });
+        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeSetStadium, exposeHandleCommand, exposeSaveReplay);
     }
 }
