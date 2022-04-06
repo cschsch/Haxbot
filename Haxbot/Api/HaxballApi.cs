@@ -66,6 +66,7 @@ public class HaxballApi
         const replay = room.stopRecording();
         const base64 = btoa(String.fromCharCode.apply(null, replay));
         await saveReplay(base64);
+        await finishGame({ red: 0, blue: 0 });
     }
 }", Configuration.RoomConfiguration, Token, Configuration.RoomAdmins);
 
