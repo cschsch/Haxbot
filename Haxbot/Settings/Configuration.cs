@@ -25,14 +25,6 @@ public record Configuration
         RoomConfiguration = new RoomConfiguration();
         RoomAdmins = Array.Empty<string>();
         BotOwner = string.Empty;
-        StandardOverviewCommands = new[]
-        {
-            "query --to {0} games overview player",
-            "query games overview player",
-            "query --to {0} games overview team",
-            "query games overview team",
-            "query games overview stadium player",
-            "query games overview stadium team"
-        };
+        StandardOverviewCommands = Array.Empty<string>();
     }
 }
