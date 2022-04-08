@@ -9,7 +9,7 @@ namespace CLI;
 public class Program
 {
     private static Configuration GetConfiguration(string[] args) => new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json")
+        .AddJsonFile("haxbotconfig.json")
         .AddCommandLine(args,
             CommandSwitches.RootSwitches
             .Concat(CommandSwitches.CreateRoomSwitches)
