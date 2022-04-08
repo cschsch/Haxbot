@@ -27,6 +27,7 @@ public class HaxballApi
     roomConfig.token = token;
     room = HBInit(roomConfig);
     room.setTimeLimit(roomConfig.timeLimit);
+    room.stadium = 'Classic';
     idAuths = [];
     room.onPlayerJoin = async function (player) {
         idAuths.push([player.id, player.auth]);
@@ -36,7 +37,7 @@ public class HaxballApi
     };
     room.onGameStart = async function (byPlayer) {
         const players = room.getPlayerList();
-        const couldStartGame = await startGame(players, idAuths);
+        const couldStartGame = await startGame(room.stadium, players, idAuths);
         if (couldStartGame) 
         {
             room.startRecording();
@@ -56,7 +57,7 @@ public class HaxballApi
         }
     };
     room.onStadiumChange = async function (stadium, player) {
-        await setStadium(stadium, player);
+        room.stadium = stadium;
     };
     room.onPlayerChat = async function (player, message) {
         const answer = await handleCommand(player, message);
@@ -81,12 +82,11 @@ public class HaxballApi
     private async Task ExposeFunctions()
     {
         var exposePlayerJoined = Page.ExposeFunctionAsync<HaxballPlayer, object>("playerJoined", player => { ApiFunctions.OnPlayerJoin(player); return default!; });
-        var exposeStartGame = Page.ExposeFunctionAsync<HaxballPlayer[], string[][], bool>("startGame", (players, idAuths) => ApiFunctions.StartGame(players.Select(player => player.EnrichAuth(idAuths)).ToArray()));
+        var exposeStartGame = Page.ExposeFunctionAsync<string, HaxballPlayer[], string[][], bool>("startGame", (stadium, players, idAuths) => ApiFunctions.StartGame(stadium, players.Select(player => player.EnrichAuth(idAuths)).ToArray()));
         var exposeFinishGame = Page.ExposeFunctionAsync<HaxballScores, bool>("finishGame", ApiFunctions.FinishGame);
         var exposeCloseRoom = Page.ExposeFunctionAsync("closeRoom", ApiFunctions.CloseRoom);
-        var exposeSetStadium = Page.ExposeFunctionAsync<string, HaxballPlayer, object>("setStadium", (stadium, player) => { ApiFunctions.SetStadium(stadium, player); return default!; });
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
         var exposeSaveReplay = Page.ExposeFunctionAsync<string, object>("saveReplay", base64 => { ApiFunctions.SaveReplay(base64); return default!; });
-        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeSetStadium, exposeHandleCommand, exposeSaveReplay);
+        await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeHandleCommand, exposeSaveReplay);
     }
 }

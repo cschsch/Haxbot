@@ -119,7 +119,7 @@ HBInit = roomConfiguration => {{
         var expected = new HaxballPlayer { Id = 1, Auth = "player" };
         var page = await SetUpPage($"_ => {{ return {{ getPlayerList: _ => [ {{ id: {expected.Id} }} ] }}; }}");
         var functions = new Mock<IHaxballApiFunctions>();
-        functions.Setup(f => f.StartGame(It.IsAny<HaxballPlayer[]>())).Returns(true);
+        functions.Setup(f => f.StartGame(It.IsAny<string>(), It.IsAny<HaxballPlayer[]>())).Returns(true);
         var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
 
         // act
@@ -127,7 +127,7 @@ HBInit = roomConfiguration => {{
         await page.EvaluateExpressionAsync($"room.onPlayerJoin({{ id: {expected.Id}, auth: '{expected.Auth}' }}); room.onGameStart();");
 
         // assert
-        functions.Verify(f => f.StartGame(It.Is<HaxballPlayer[]>(players => players.Single() == expected)));
+        functions.Verify(f => f.StartGame(It.IsAny<string>(), It.Is<HaxballPlayer[]>(players => players.Single() == expected)));
     }
 
     [Test]
@@ -136,7 +136,7 @@ HBInit = roomConfiguration => {{
         // arrange
         var page = await SetUpPage("_ => { return { getPlayerList: _ => [], sendChat: message => window.message = message }; }");
         var functions = new Mock<IHaxballApiFunctions>();
-        functions.Setup(f => f.StartGame(It.IsAny<HaxballPlayer[]>())).Returns(false);
+        functions.Setup(f => f.StartGame(It.IsAny<string>(), It.IsAny<HaxballPlayer[]>())).Returns(false);
         var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
 
         // act
@@ -196,22 +196,6 @@ HBInit = roomConfiguration => {{
 
         // assert
         functions.Verify(f => f.CloseRoom());
-    }
-
-    [Test]
-    public async Task OnStadiumChange_CallsSetStadium()
-    {
-        // arrange
-        var page = await SetUpPage();
-        var functions = new Mock<IHaxballApiFunctions>();
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
-
-        // act
-        await api.CreateRoomAsync();
-        await page.EvaluateExpressionAsync("room.onStadiumChange('teeeheee', {})");
-
-        // assert
-        functions.Verify(f => f.SetStadium("teeeheee", It.IsAny<HaxballPlayer>()));
     }
 
     [Test]

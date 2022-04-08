@@ -6,10 +6,9 @@ namespace Haxbot.Api;
 public interface IHaxballApiFunctions
 {
     void OnPlayerJoin(HaxballPlayer player);
-    bool StartGame(HaxballPlayer[] players);
+    bool StartGame(string stadium, HaxballPlayer[] players);
     bool FinishGame(HaxballScores scores);
     void CloseRoom();
-    void SetStadium(string stadium, HaxballPlayer player);
     string HandleCommand(HaxballPlayer player, string message);
     void SaveReplay(string base64);
 }
@@ -35,9 +34,9 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
         PlayerJoined?.Invoke(this, new PlayerJoinedEventArgs(player));
     }
 
-    public bool StartGame(HaxballPlayer[] players)
+    public bool StartGame(string stadium, HaxballPlayer[] players)
     {
-        CurrentGame = new Game { State = GameState.Undecided, Stadium = CurrentGame.Stadium };
+        CurrentGame = new Game { State = GameState.Undecided, Stadium = stadium };
 
         var mappedTeamPlayers = players
             .Where(player => player.Team != TeamId.Spectators)
@@ -86,12 +85,6 @@ public class HaxballApiFunctions : IHaxballApiFunctions, IDisposable
     {
         RoomClosed?.Invoke(this, EventArgs.Empty);
         Dispose();
-    }
-
-    public void SetStadium(string stadium, HaxballPlayer player)
-    {
-        CurrentGame.Stadium = stadium;
-        Context.SaveChanges();
     }
 
     public string HandleCommand(HaxballPlayer player, string message)

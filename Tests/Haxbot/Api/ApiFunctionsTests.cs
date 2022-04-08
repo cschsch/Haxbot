@@ -47,7 +47,7 @@ public class ApiFunctionsTests
         var players = new[] { new HaxballPlayer { Team = TeamId.Spectators } };
 
         // act
-        functions.StartGame(players);
+        functions.StartGame(string.Empty, players);
 
         // assert
         var game = games.Single();
@@ -67,7 +67,7 @@ public class ApiFunctionsTests
         var players = new[] { new HaxballPlayer { Auth = playersInDb.Single().Auth, Team = TeamId.Red } };
 
         // act
-        functions.StartGame(players);
+        functions.StartGame(string.Empty, players);
 
         // assert
         var player = games.Single().Red.Players.Single();
@@ -87,7 +87,7 @@ public class ApiFunctionsTests
         var salomon = new HaxballPlayer { Name = "salomon", Auth = "2", Team = TeamId.Blue };
 
         // act
-        functions.StartGame(new[] { peter, salomon });
+        functions.StartGame(string.Empty, new[] { peter, salomon });
 
         // assert
         var game = games.Single();
@@ -110,7 +110,7 @@ public class ApiFunctionsTests
         var functions = new HaxballApiFunctions(context.Object);
 
         // act
-        functions.StartGame(Array.Empty<HaxballPlayer>());
+        functions.StartGame(string.Empty, Array.Empty<HaxballPlayer>());
         functions.FinishGame(new());
 
         // assert
@@ -127,7 +127,7 @@ public class ApiFunctionsTests
         var functions = new HaxballApiFunctions(context.Object);
 
         // act
-        functions.StartGame(Array.Empty<HaxballPlayer>());
+        functions.StartGame(string.Empty, Array.Empty<HaxballPlayer>());
         functions.FinishGame(new HaxballScores { Red = 1 });
 
         // assert
@@ -144,7 +144,7 @@ public class ApiFunctionsTests
         var functions = new HaxballApiFunctions(context.Object);
 
         // act
-        functions.StartGame(Array.Empty<HaxballPlayer>());
+        functions.StartGame(string.Empty, Array.Empty<HaxballPlayer>());
         functions.FinishGame(new HaxballScores { Blue = 1 });
 
         // assert
@@ -173,23 +173,6 @@ public class ApiFunctionsTests
     }
 
     [Test]
-    public void SetStadium_SetsStadium()
-    {
-        // arrange
-        var games = new List<Game>();
-        var context = new Mock<HaxbotContext>(Configuration).Add(games);
-        var functions = new HaxballApiFunctions(context.Object);
-
-        // act
-        functions.StartGame(Array.Empty<HaxballPlayer>());
-        functions.SetStadium("tollio", new());
-
-        // assert
-        var game = games.Single();
-        Assert.AreEqual("tollio", game.Stadium);
-    }
-
-    [Test]
     public void SaveReplay_SetsReplay()
     {
         // arrange
@@ -198,7 +181,7 @@ public class ApiFunctionsTests
         var functions = new HaxballApiFunctions(context.Object);
 
         // act
-        functions.StartGame(Array.Empty<HaxballPlayer>());
+        functions.StartGame(string.Empty, Array.Empty<HaxballPlayer>());
         functions.SaveReplay("QQ==");
 
         // assert
