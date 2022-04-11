@@ -66,6 +66,13 @@ public class HaxbotApp
 
     private static (IQueryable<Game>, IQueryable<Player>) FilterByOptions(HaxbotContext context, QueryFilter filter, IQueryable<Game> games)
     {
+        Team GetTeam(IQueryable<Player> players)
+        {
+            var teamPlayers = players.ToArray();
+            var team = context.Teams!.Include(team => team.Players).AsEnumerable().SingleOrDefault(team => team.Players.Count == teamPlayers.Length && teamPlayers.All(player => team.Players.Contains(player)));
+            return team ?? new Team();
+        }
+
         var playersInDb = filter.Players.Any()
             ? filter.Auth
                 ? context.Players!.ByAuth(filter.Players)
@@ -73,7 +80,7 @@ public class HaxbotApp
             : context.Players!;
         var gamesByUndecided = games.Where(game => filter.Undecided || game.State != GameState.Undecided);
         var gamesByTime = gamesByUndecided.Between(filter.From, filter.To);
-        var gamesByPlayers = filter.Team ? gamesByTime.WithTeam(playersInDb) : gamesByTime.WithAny(playersInDb);
+        var gamesByPlayers = filter.Team ? gamesByTime.WithTeam(GetTeam(playersInDb)) : gamesByTime.WithAny(playersInDb);
         var gamesByStadium = gamesByPlayers.PlayedOn(filter.Stadium);
         return (gamesByStadium, playersInDb);
     }

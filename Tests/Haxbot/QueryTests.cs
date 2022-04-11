@@ -494,7 +494,7 @@ public class QueryTests
         game.Blue.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WithTeam(Enumerable.Empty<Player>().AsQueryable());
+        var result = new[] { game }.AsQueryable().WithTeam(new Team { Players = Array.Empty<Player>() });
 
         // assert
         CollectionAssert.IsEmpty(result);
@@ -511,14 +511,14 @@ public class QueryTests
         game.Blue.Players.Add(blue);
 
         // act
-        var result = new[] { game }.AsQueryable().WithTeam(new [] { red, blue }.AsQueryable());
+        var result = new[] { game }.AsQueryable().WithTeam(new Team { Players = new[] { red, blue } });
 
         // assert
         CollectionAssert.IsEmpty(result);
     }
 
     [Test]
-    public void WithTeam_MoreInTeamThanAskedFor_IsGame()
+    public void WithTeam_MoreInTeamThanAskedFor_IsEmpty()
     {
         // arrange
         var player = new Player();
@@ -527,7 +527,22 @@ public class QueryTests
         game.Red.Players.Add(new Player());
 
         // act
-        var result = new[] { game }.AsQueryable().WithTeam(new[] { player }.AsQueryable());
+        var result = new[] { game }.AsQueryable().WithTeam(new Team { Players = new[] { player } });
+
+        // assert
+        CollectionAssert.IsEmpty(result);
+    }
+
+    [Test]
+    public void WithTeam_ExactMatch_IsGame()
+    {
+        // arrange
+        var player = new Player();
+        var game = new Game();
+        game.Blue.Players.Add(player);
+
+        // act
+        var result = new[] { game }.AsQueryable().WithTeam(new Team { Players = new[] { player } });
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);

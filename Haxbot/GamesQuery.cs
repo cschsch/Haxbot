@@ -36,10 +36,9 @@ public static class GamesQuery
     public static IQueryable<Game> WithAny(this IQueryable<Game> games, IQueryable<Player> players)
         => games.Where(game => players.Any(player => game.Red.Players.Contains(player) || game.Blue.Players.Contains(player)));
 
-    public static IQueryable<Game> WithTeam(this IQueryable<Game> games, IQueryable<Player> team)
+    public static IQueryable<Game> WithTeam(this IQueryable<Game> games, Team team)
     {
-        if (!team.Any()) return Enumerable.Empty<Game>().AsQueryable();
-        return games.Where(game => team.All(player => game.Red.Players.Contains(player)) || team.All(player => game.Blue.Players.Contains(player)));
+        return games.Where(game => game.Red == team || game.Blue == team);
     }
 
     public static IQueryable<Game> PlayedOn(this IQueryable<Game> games, string stadium) => 

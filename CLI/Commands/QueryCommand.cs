@@ -8,7 +8,7 @@ public class QueryCommand : BinderBase<QueryFilter>
 {
     public Option<string[]> Players { get; init; } = new Option<string[]>(new[] { "--players", "-p" }, "Look for games where any of these players participated.") { Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
     public Option<bool> Auth { get; init; } = new Option<bool>(new[] { "--auth", "-a" }, () => false, "Look for public Auth instead of name. See https://www.haxball.com/playerauth");
-    public Option<bool> Team { get; init; } = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look for games where all of the given players were in one team.");
+    public Option<bool> Team { get; init; } = new Option<bool>(new[] { "--team", "-t" }, () => false, "Look for games where all of the given players built a team.");
     public Option<DateTime> From { get; init; } = new Option<DateTime>("--from", () => DateTime.MinValue, "Only count games played since the give time.");
     public Option<DateTime> To { get; init; } = new Option<DateTime>("--to", () => DateTime.MaxValue, "Only count games played until the given time.");
     public Option<bool> Undecided { get; init; } = new Option<bool>(new[] { "--undecided", "-u" }, () => false, "Include undecided games.");
