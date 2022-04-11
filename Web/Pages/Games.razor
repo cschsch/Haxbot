@@ -1,0 +1,178 @@
+﻿@page "/games"
+
+<PageTitle>Games</PageTitle>
+
+@using Haxbot.Entities
+@using Web.Data
+@inject IJSRuntime JS
+@inject GamesService GamesService
+
+<Heading Size="HeadingSize.Is1">Games</Heading>
+
+<Paragraph>Use this to filter previously played games and to save their replays.</Paragraph>
+
+<Row Gutter="(32, 16)">
+    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
+        <Heading Size="HeadingSize.Is6">Filter games by players participated</Heading>
+        <Divider />
+        <ListGroup Mode="ListGroupMode.Selectable">
+            @foreach (var player in QueryModel.Players)
+            {
+                <ListGroupItem Clicked="() => RemovePlayerFilter(player)">@player</ListGroupItem>
+            }
+        </ListGroup>
+        <Divider DividerType="DividerType.Dotted" @bind-Visibility="HasPlayerFilter" />
+        <Field Horizontal>
+            <FieldBody ColumnSize="ColumnSize.Is11">
+                <TextEdit Placeholder="Name or auth of player..." @bind-Text="_playerFilterText" KeyPress="args => AddPlayerFilter(args)" />
+            </FieldBody>
+            <Button Color=Color.Primary Clicked="AddPlayerFilter">Add</Button>
+        </Field>
+        <Check TValue="bool" @bind-Checked="QueryModel.Auth">Search for auth instead</Check>
+        <Check TValue="bool" @bind-Checked="QueryModel.Team">Players must build a team</Check>
+    </Column>
+    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
+        <Heading Size="HeadingSize.Is6">Filter games by time of kick-off</Heading>
+        <Divider />
+        <Field Horizontal>
+            <FieldLabel ColumnSize="ColumnSize.Is2">From</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is10">
+                <DatePicker TValue="DateTime?" InputMode="DateInputMode.DateTime" @bind-Date="QueryModel.From"></DatePicker>
+            </FieldBody>
+        </Field>
+        <Field Horizontal>
+            <FieldLabel ColumnSize="ColumnSize.Is2">To</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is10">
+                <DatePicker TValue="DateTime?" InputMode="DateInputMode.DateTime" @bind-Date="QueryModel.To"></DatePicker>
+            </FieldBody>
+        </Field>
+    </Column>
+</Row>
+<Row Gutter="(32, 16)" Margin="Margin.Is1.FromTop">
+    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
+        <Heading Size="HeadingSize.Is6">Miscellaneous options to filter by</Heading>
+        <Divider />
+        <TextEdit Placeholder="Name of stadium..." @bind-Text="QueryModel.Stadium" />
+        <Divider DividerType="DividerType.Dotted" />
+        <Check TValue="bool" @bind-Checked="QueryModel.Undecided">Include games with GameState.Undecided</Check>
+    </Column>
+    <Column Margin="Margin.Is1" >
+        <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Searching for games...", "Searching...")!.ContinueWith(_ => GetGames())!)" Color="Color.Primary">Search</Button>
+    </Column>
+</Row>
+
+<Divider />
+
+<DataGrid 
+    TItem="GameModel" 
+    Data="_games" 
+    Responsive 
+    Filterable FilterMethod="DataGridFilterMethod.Contains" 
+    Sortable SortMode="DataGridSortMode.Multiple" 
+    Resizable ResizeMode="TableResizeMode.Columns"
+    ShowPager PageSize="10" ShowPageSizes PageSizes="@(new [] { 5, 10, 25, 50 })">
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(GameModel.Id)" Caption="#" Sortable="false" />
+        <DataGridDateColumn Field="@nameof(GameModel.Created)" Caption="Created"/>
+        <DataGridColumn Field="@nameof(GameModel.Stadium)" Caption="Stadium"/>
+        <DataGridColumn Field="@nameof(GameModel.WinningTeam)" Caption="Winning Team" CustomFilter="PlayerNameFilter" Sortable="false">
+            <DisplayTemplate>
+                @{
+                    @((context as GameModel)?.WinningTeam?.GetPlayerNames())
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="@nameof(GameModel.LosingTeam)" Caption="Losing Team" CustomFilter="PlayerNameFilter" Sortable="false">
+            <DisplayTemplate>
+                @{
+                    @((context as GameModel)?.LosingTeam?.GetPlayerNames())
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="@nameof(GameModel.Red)" Caption="Red" CustomFilter="PlayerNameFilter" Sortable="false">
+            <DisplayTemplate>
+                @{
+                    @((context as GameModel)?.Red.GetPlayerNames())
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="@nameof(GameModel.Blue)" Caption="Blue" CustomFilter="PlayerNameFilter" Sortable="false">
+            <DisplayTemplate>
+                @{
+                    @((context as GameModel)?.Blue.GetPlayerNames())
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="@nameof(GameModel.State)" Caption="State"/>
+        <DataGridColumn Field="@nameof(GameModel.Replay)" Caption="Save Replay" Sortable="false" Filterable="false">
+            <DisplayTemplate>
+                <Button Color="Color.Primary" Clicked="@(() => SaveReplay(context))"><Icon Name="IconName.Save"/></Button>
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+</DataGrid>
+
+@code {
+    [Inject] private INotificationService? NotificationService { get; set; }
+    private GamesQueryModel QueryModel { get; } = new();
+    private string _playerFilterText = string.Empty;
+    private GameModel[] _games = Array.Empty<GameModel>();
+
+    private Visibility HasPlayerFilter
+    {
+        get => QueryModel.Players.Any() ? Visibility.Visible : Visibility.Invisible;
+        set { }
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    private void AddPlayerFilter()
+    {
+        if (string.IsNullOrWhiteSpace(_playerFilterText)) return;
+        QueryModel.Players.Add(_playerFilterText);
+        _playerFilterText = string.Empty;
+    }
+
+    private void AddPlayerFilter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddPlayerFilter();
+    }
+
+    private void RemovePlayerFilter(string player)
+    {
+        QueryModel.Players.Remove(player);
+    }
+
+    private bool PlayerNameFilter(object itemValue, object searchValue)
+    {
+        if (searchValue is string playerNames && itemValue is Team team)
+        {
+            return team.GetPlayerNames().Contains(playerNames);
+        }
+
+        return true;
+    }
+
+    private EventCallback SaveReplay(GameModel? model)
+    {
+        if (model is null || string.IsNullOrWhiteSpace(model.Replay))
+        {
+            NotificationService?.Warning("Cannot download replay", "Error");
+        }
+        else
+        {
+            JS.InvokeVoidAsync("saveAsFile", "replay.hbr2", model.Replay);
+        }
+
+        return EventCallback.Empty;
+    }
+
+    private async Task GetGames()
+    {
+        _games = GamesService.GetGames(QueryModel).OrderByDescending(game => game.Created).ToArray();
+        if (!_games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
+    }
+}

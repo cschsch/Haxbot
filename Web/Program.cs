@@ -1,3 +1,8 @@
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
+using Haxbot;
+using Haxbot.Settings;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Web.Data;
@@ -5,9 +10,19 @@ using Web.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddBlazorise(options => options.Immediate = true)
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+
+var configuration = new ConfigurationBuilder()
+        .AddJsonFile("haxbotconfig.json")
+        .Build()
+        .Get<Configuration>();
+
+builder.Services.AddSingleton<GamesService>(_ => new GamesService(new HaxbotContext(configuration)));
 
 var app = builder.Build();
 
