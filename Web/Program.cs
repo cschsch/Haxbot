@@ -15,7 +15,6 @@ builder.Services.AddBlazorise(options => options.Immediate = true)
     .AddFontAwesomeIcons();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var configuration = new ConfigurationBuilder()
         .AddJsonFile("haxbotconfig.json")
