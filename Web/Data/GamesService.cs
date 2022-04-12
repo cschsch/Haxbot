@@ -24,12 +24,12 @@ public class GamesService
 
         Func<IEnumerable<string>, IQueryable<Player>> playerFilter = gamesQueryModel.Auth ? Context.Players!.ByAuth : Context.Players!.ByName;
         var players = gamesQueryModel.Players.Any() ? playerFilter(gamesQueryModel.Players) : Context.Players!;
-        var withTeam = gamesQueryModel.Team ? Context.Games!.WithTeam(GetTeam(players)) : Context.Games!.WithAny(players);
-        return withTeam
+        var games = Context.Games!
             .Between(gamesQueryModel.From ?? DateTime.MinValue, gamesQueryModel.To ?? DateTime.MaxValue)
             .PlayedOn(gamesQueryModel.Stadium)
             .Where(game => game.State != GameState.Undecided || gamesQueryModel.Undecided)
-            .Include(game => game.Red.Players).Include(game => game.Blue.Players)
-            .Select(game => new GameModel(game));
+            .Include(game => game.Red.Players).Include(game => game.Blue.Players);
+        Func<IQueryable<Game>, IQueryable<Game>> teamFilter = games => gamesQueryModel.Team ? games.WithTeam(GetTeam(players)) : games.WithAny(players);
+        return teamFilter(games).Select(game => new GameModel(game));
     }
 }

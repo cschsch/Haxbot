@@ -6,6 +6,7 @@
 @using Web.Data
 @inject IJSRuntime JS
 @inject GamesService GamesService
+@inject INotificationService NotificationService
 
 <Heading Size="HeadingSize.Is1">Games</Heading>
 
@@ -113,7 +114,6 @@
 </DataGrid>
 
 @code {
-    [Inject] private INotificationService? NotificationService { get; set; }
     private GamesQueryModel QueryModel { get; } = new();
     private string _playerFilterText = string.Empty;
     private GameModel[] _games = Array.Empty<GameModel>();
