@@ -20,19 +20,27 @@
     </Column>
 </Row>
 <Row Gutter="(32, 16)" Margin="Margin.Is1.FromTop">
-    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
+    <Column ColumnSize="ColumnSize.Is5" Margin="Margin.Is1" Border="Border.Is1.Rounded">
         <MiscFilter QueryModel="QueryModel" />
     </Column>
-    <Column Margin="Margin.Is1" >
+    <Column ColumnSize="ColumnSize.Is5" Margin="Margin.Is1" Border="Border.Is1.Rounded">
+        <Heading Size="HeadingSize.Is6">Options for data aggregation</Heading>
+        <Divider />
+        <Check @bind-Checked="_groupByTeam">Group by teams instead of players</Check>
+    </Column>
+    <Column Margin="Margin.Is1">
         <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Searching for games...", "Searching...")!.ContinueWith(_ => GetGames())!)" Color="Color.Primary">Aggregate</Button>
     </Column>
 </Row>
 
 <Divider />
 
+
+
 @code {
     private GamesQueryModel QueryModel { get; } = new();
     private GameModel[] _games = Array.Empty<GameModel>();
+    private bool _groupByTeam;
 
     protected override Task OnInitializedAsync()
     {
