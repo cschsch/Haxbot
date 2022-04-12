@@ -1,0 +1,20 @@
+﻿@using Web.Data
+<Heading Size="HeadingSize.Is6">Filter games by time of kick-off</Heading>
+<Divider />
+<Field Horizontal>
+    <FieldLabel ColumnSize="ColumnSize.Is2">From</FieldLabel>
+    <FieldBody ColumnSize="ColumnSize.Is10">
+        <DatePicker TValue="DateTime?" InputMode="DateInputMode.DateTime" @bind-Date="QueryModel.From"></DatePicker>
+    </FieldBody>
+</Field>
+<Field Horizontal>
+    <FieldLabel ColumnSize="ColumnSize.Is2">To</FieldLabel>
+    <FieldBody ColumnSize="ColumnSize.Is10">
+        <DatePicker TValue="DateTime?" InputMode="DateInputMode.DateTime" @bind-Date="QueryModel.To"></DatePicker>
+    </FieldBody>
+</Field>
+
+@code {
+    [Parameter]
+    public GamesQueryModel QueryModel { get; set; } = new();
+}

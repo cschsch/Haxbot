@@ -14,48 +14,15 @@
 
 <Row Gutter="(32, 16)">
     <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <Heading Size="HeadingSize.Is6">Filter games by players participated</Heading>
-        <Divider />
-        <ListGroup Mode="ListGroupMode.Selectable">
-            @foreach (var player in QueryModel.Players)
-            {
-                <ListGroupItem Clicked="() => RemovePlayerFilter(player)">@player</ListGroupItem>
-            }
-        </ListGroup>
-        <Divider DividerType="DividerType.Dotted" @bind-Visibility="HasPlayerFilter" />
-        <Field Horizontal>
-            <FieldBody ColumnSize="ColumnSize.Is11">
-                <TextEdit Placeholder="Name or auth of player..." @bind-Text="_playerFilterText" KeyPress="args => AddPlayerFilter(args)" />
-            </FieldBody>
-            <Button Color=Color.Primary Clicked="AddPlayerFilter">Add</Button>
-        </Field>
-        <Check TValue="bool" @bind-Checked="QueryModel.Auth">Search for auth instead</Check>
-        <Check TValue="bool" @bind-Checked="QueryModel.Team">Players must build a team</Check>
+        <PlayerFilter QueryModel="QueryModel" />
     </Column>
     <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <Heading Size="HeadingSize.Is6">Filter games by time of kick-off</Heading>
-        <Divider />
-        <Field Horizontal>
-            <FieldLabel ColumnSize="ColumnSize.Is2">From</FieldLabel>
-            <FieldBody ColumnSize="ColumnSize.Is10">
-                <DatePicker TValue="DateTime?" InputMode="DateInputMode.DateTime" @bind-Date="QueryModel.From"></DatePicker>
-            </FieldBody>
-        </Field>
-        <Field Horizontal>
-            <FieldLabel ColumnSize="ColumnSize.Is2">To</FieldLabel>
-            <FieldBody ColumnSize="ColumnSize.Is10">
-                <DatePicker TValue="DateTime?" InputMode="DateInputMode.DateTime" @bind-Date="QueryModel.To"></DatePicker>
-            </FieldBody>
-        </Field>
+        <TimeFilter QueryModel="QueryModel" />
     </Column>
 </Row>
 <Row Gutter="(32, 16)" Margin="Margin.Is1.FromTop">
     <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <Heading Size="HeadingSize.Is6">Miscellaneous options to filter by</Heading>
-        <Divider />
-        <TextEdit Placeholder="Name of stadium..." @bind-Text="QueryModel.Stadium" />
-        <Divider DividerType="DividerType.Dotted" />
-        <Check TValue="bool" @bind-Checked="QueryModel.Undecided">Include games with GameState.Undecided</Check>
+        <MiscFilter WithUndecided QueryModel="QueryModel" />
     </Column>
     <Column Margin="Margin.Is1" >
         <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Searching for games...", "Searching...")!.ContinueWith(_ => GetGames())!)" Color="Color.Primary">Search</Button>
@@ -123,35 +90,11 @@
 
 @code {
     private GamesQueryModel QueryModel { get; } = new();
-    private string _playerFilterText = string.Empty;
     private GameModel[] _games = Array.Empty<GameModel>();
-
-    private Visibility HasPlayerFilter
-    {
-        get => QueryModel.Players.Any() ? Visibility.Visible : Visibility.Invisible;
-        set { }
-    }
 
     protected override Task OnInitializedAsync()
     {
         return base.OnInitializedAsync();
-    }
-
-    private void AddPlayerFilter()
-    {
-        if (string.IsNullOrWhiteSpace(_playerFilterText)) return;
-        QueryModel.Players.Add(_playerFilterText);
-        _playerFilterText = string.Empty;
-    }
-
-    private void AddPlayerFilter(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter") AddPlayerFilter();
-    }
-
-    private void RemovePlayerFilter(string player)
-    {
-        QueryModel.Players.Remove(player);
     }
 
     private bool PlayerNameFilter(object itemValue, object searchValue)

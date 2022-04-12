@@ -1,0 +1,47 @@
+﻿@using Web.Data
+<Heading Size="HeadingSize.Is6">Filter games by players participated</Heading>
+<Divider />
+<ListGroup Mode="ListGroupMode.Selectable">
+    @foreach (var player in QueryModel.Players)
+    {
+        <ListGroupItem Clicked="() => RemovePlayerFilter(player)">@player</ListGroupItem>
+    }
+</ListGroup>
+<Divider DividerType="DividerType.Dotted" @bind-Visibility="HasPlayerFilter" />
+<Field Horizontal>
+    <FieldBody ColumnSize="ColumnSize.Is11">
+        <TextEdit Placeholder="Name or auth of player..." @bind-Text="_playerFilterText" KeyPress="args => AddPlayerFilter(args)" />
+    </FieldBody>
+    <Button Color=Color.Primary Clicked="AddPlayerFilter">Add</Button>
+</Field>
+<Check TValue="bool" @bind-Checked="QueryModel.Auth">Search for auth instead</Check>
+<Check TValue="bool" @bind-Checked="QueryModel.Team">Players must build a team</Check>
+
+@code {
+    [Parameter]
+    public GamesQueryModel QueryModel { get; set; } = new();
+    private string _playerFilterText = string.Empty;
+
+    private void AddPlayerFilter()
+    {
+        if (string.IsNullOrWhiteSpace(_playerFilterText)) return;
+        QueryModel?.Players.Add(_playerFilterText);
+        _playerFilterText = string.Empty;
+    }
+
+    private void AddPlayerFilter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") AddPlayerFilter();
+    }
+
+    private void RemovePlayerFilter(string player)
+    {
+        QueryModel?.Players.Remove(player);
+    }
+
+    private Visibility HasPlayerFilter
+    {
+        get => QueryModel.Players.Any() ? Visibility.Visible : Visibility.Invisible;
+        set { }
+    }
+}

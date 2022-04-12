@@ -1,0 +1,16 @@
+﻿@using Web.Data
+<Heading Size="HeadingSize.Is6">Miscellaneous options to filter by</Heading>
+<Divider />
+<TextEdit Placeholder="Name of stadium..." @bind-Text="QueryModel.Stadium" />
+@if (WithUndecided)
+{
+    <Divider DividerType="DividerType.Dotted" />
+    <Check TValue="bool" @bind-Checked="QueryModel.Undecided">Include games with GameState.Undecided</Check>
+}
+
+@code {
+    [Parameter]
+    public GamesQueryModel QueryModel { get; set; } = new();
+    [Parameter]
+    public bool WithUndecided { get; set; }
+}
