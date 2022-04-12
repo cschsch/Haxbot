@@ -1,7 +1,9 @@
 ﻿@using Web.Data
 <Heading Size="HeadingSize.Is6">Miscellaneous options to filter by</Heading>
 <Divider />
-<TextEdit Placeholder="Name of stadium..." @bind-Text="QueryModel.Stadium" />
+<Tooltip Text="Case-sensitive partial match">
+    <TextEdit Placeholder="Name of stadium..." @bind-Text="QueryModel.Stadium" />
+</Tooltip>
 @if (WithUndecided)
 {
     <Divider DividerType="DividerType.Dotted" />

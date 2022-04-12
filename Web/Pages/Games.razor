@@ -80,7 +80,9 @@
                         <Button Color="Color.Primary" Clicked="@(() => SaveReplay(context))"><Icon Name="IconName.Save"/></Button>
                     } else
                     {
-                        <Button Color="Color.Danger"><Icon Name="IconName.TimesCircle"/></Button>
+                        <Tooltip Text="No replay available" Placement="TooltipPlacement.Right">
+                            <Button Disabled Color="Color.Danger"><Icon Name="IconName.TimesCircle"/></Button>
+                        </Tooltip>
                     }
                 }
             </DisplayTemplate>
