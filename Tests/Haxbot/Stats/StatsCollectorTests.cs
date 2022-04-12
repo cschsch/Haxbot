@@ -1,10 +1,10 @@
-﻿using CLI.Stats;
-using Haxbot.Entities;
+﻿using Haxbot.Entities;
+using Haxbot.Stats;
 using NUnit.Framework;
 using System.Collections.Concurrent;
 using System.Linq;
 
-namespace Tests.CLI.Stats;
+namespace Tests.Haxbot.Stats;
 
 [Parallelizable(ParallelScope.All)]
 public class StatsCollectorTests

@@ -1,5 +1,6 @@
 ﻿using CLI.Extensions;
 using Haxbot.Settings;
+using Haxbot.Stats;
 using System.CommandLine;
 using System.CommandLine.Binding;
 

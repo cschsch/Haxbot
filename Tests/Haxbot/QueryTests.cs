@@ -537,12 +537,11 @@ public class QueryTests
     public void WithTeam_ExactMatch_IsGame()
     {
         // arrange
-        var player = new Player();
-        var game = new Game();
-        game.Blue.Players.Add(player);
+        var team = new Team();
+        var game = new Game { Blue = team };
 
         // act
-        var result = new[] { game }.AsQueryable().WithTeam(new Team { Players = new[] { player } });
+        var result = new[] { game }.AsQueryable().WithTeam(team);
 
         // assert
         CollectionAssert.AreEqual(new[] { game }, result);

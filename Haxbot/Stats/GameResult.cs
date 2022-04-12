@@ -1,4 +1,4 @@
-﻿namespace CLI.Commands;
+﻿namespace Haxbot.Stats;
 
 public enum GameResult
 {

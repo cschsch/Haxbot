@@ -1,5 +1,5 @@
-﻿using CLI.Stats;
-using Haxbot.Entities;
+﻿using Haxbot.Entities;
+using Haxbot.Stats;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tests.CLI.Stats;
+namespace Tests.Haxbot.Stats;
 
 [Parallelizable(ParallelScope.All)]
 public class GroupedStatsCollectorTests

@@ -1,8 +1,8 @@
-﻿using CLI.Extensions;
-using Haxbot.Entities;
+﻿using Haxbot.Entities;
+using Haxbot.Extensions;
 using System.Collections.Concurrent;
 
-namespace CLI.Stats;
+namespace Haxbot.Stats;
 
 public interface IGroupedStatsCollector<TKey, TStatsCollector> : IStatsCollector
 {
@@ -29,7 +29,7 @@ public abstract class GroupedStatsCollector<TKey, TStatsCollector> : IGroupedSta
         collector.Register(game, players);
     }
 
-    public string FormatTable()
+    public string FormatTable(Func<IEnumerable<GameStats>, string> formatTable)
     {
         Func<string, string, string> join;
 
@@ -56,7 +56,7 @@ $@"{bannerHalf} {key} {bannerHalf}
         var entries = OrderStatsCollectors(_statsCollectors).Select(statsCollector =>
         {
             var key = KeyToString(statsCollector.Key);
-            var value = statsCollector.Value.FormatTable();
+            var value = statsCollector.Value.FormatTable(formatTable);
             return join(key, value);
         });
         return string.Join(Environment.NewLine + Environment.NewLine, entries);

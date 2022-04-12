@@ -1,4 +1,4 @@
-﻿namespace CLI.Extensions;
+﻿namespace Haxbot.Extensions;
 
 public static class TypeExtensions
 {

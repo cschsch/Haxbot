@@ -1,9 +1,9 @@
 ﻿using Haxbot.Entities;
 
-namespace CLI.Stats;
+namespace Haxbot.Stats;
 
 public interface IStatsCollector
 {
     void Register(Game game, IEnumerable<Player> players);
-    string FormatTable();
+    string FormatTable(Func<IEnumerable<GameStats>, string> formatTable);
 }

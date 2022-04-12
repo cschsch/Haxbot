@@ -1,8 +1,8 @@
-﻿using CLI.Commands;
-using Haxbot.Api;
+﻿using Haxbot.Api;
 using Haxbot.Entities;
+using Haxbot.Stats;
 
-namespace CLI.Extensions;
+namespace Haxbot.Extensions;
 
 public static class GameExtensions
 {

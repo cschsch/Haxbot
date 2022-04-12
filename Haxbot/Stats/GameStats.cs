@@ -1,6 +1,4 @@
-﻿using CLI.Commands;
-
-namespace CLI.Stats;
+﻿namespace Haxbot.Stats;
 
 public record GameStats
 {

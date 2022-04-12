@@ -1,7 +1,7 @@
-﻿using CLI.Commands;
-using CLI.Stats;
+﻿using AsciiTableFormatter;
+using CLI.Commands;
 using Haxbot.Entities;
-using System.Reflection;
+using Haxbot.Stats;
 
 namespace CLI;
 
@@ -15,9 +15,10 @@ public class StatsPrinter
         if (!ResultGroupings.Contains(Groupings.Last())) throw new ArgumentException("Last Grouping needs to be of a result collector");
         if (Groupings.Count(ResultGroupings.Contains) > 1) throw new ArgumentException("There can only be one result collector");
 
-        var collectorTypes = Assembly.GetExecutingAssembly()
+        var collectorTypes = typeof(IStatsCollector)
+            .Assembly
             .GetTypes()
-            .Where(type => type.Namespace == "CLI.Stats" && !type.IsAbstract && !type.IsInterface && type.Name.Contains("StatsCollector"))
+            .Where(type => type.Namespace == "Haxbot.Stats" && !type.IsAbstract && !type.IsInterface && type.Name.Contains("StatsCollector"))
             .ToArray();
         var completeCollectorType = Groupings
             .Distinct()
@@ -31,7 +32,7 @@ public class StatsPrinter
     {
         var collector = GetCollector();
         Parallel.ForEach(games, game => collector.Register(game, players));
-        var result = collector.FormatTable();
+        var result = collector.FormatTable(Formatter.Format);
         Console.WriteLine(result);
     }
 }

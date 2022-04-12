@@ -1,10 +1,9 @@
-﻿using CLI.Commands;
-using CLI.Extensions;
-using Haxbot.Api;
+﻿using Haxbot.Api;
 using Haxbot.Entities;
+using Haxbot.Extensions;
 using System.Collections.Concurrent;
 
-namespace CLI.Stats;
+namespace Haxbot.Stats;
 
 public class TeamStatsCollector : StatsCollector<Team>
 {

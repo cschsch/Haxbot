@@ -1,4 +1,4 @@
-﻿namespace Haxbot;
+﻿namespace Haxbot.Extensions;
 
 public static class TaskExtensions
 {

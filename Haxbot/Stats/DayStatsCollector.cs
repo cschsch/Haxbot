@@ -1,7 +1,7 @@
 ﻿using Haxbot.Entities;
 using System.Collections.Concurrent;
 
-namespace CLI.Stats;
+namespace Haxbot.Stats;
 
 public class DayStatsCollector<TStatsCollector> : GroupedStatsCollector<DateTime, TStatsCollector>
     where TStatsCollector : IStatsCollector, new()

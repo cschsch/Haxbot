@@ -1,4 +1,5 @@
-﻿using Haxbot.Settings;
+﻿using Haxbot.Extensions;
+using Haxbot.Settings;
 using PuppeteerSharp;
 
 namespace Haxbot.Api;

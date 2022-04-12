@@ -1,8 +1,8 @@
-﻿using CLI.Commands;
-using Haxbot;
+﻿using Haxbot;
 using Haxbot.Api;
 using Haxbot.Entities;
 using Haxbot.Settings;
+using Haxbot.Stats;
 using Microsoft.EntityFrameworkCore;
 using PuppeteerSharp;
 

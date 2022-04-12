@@ -1,8 +1,7 @@
-﻿using AsciiTableFormatter;
-using Haxbot.Entities;
+﻿using Haxbot.Entities;
 using System.Collections.Concurrent;
 
-namespace CLI.Stats;
+namespace Haxbot.Stats;
 
 public interface IStatsCollector<TKey> : IStatsCollector
 {
@@ -31,13 +30,13 @@ public abstract class StatsCollector<TKey> : IStatsCollector<TKey>
         }
     }
 
-    public string FormatTable()
+    public string FormatTable(Func<IEnumerable<GameStats>, string> formatTable)
     {
         var entries = _stats.Values
             .OrderByDescending(stats => stats.Winrate)
             .ThenByDescending(stats => stats.AmountPlayed)
             .ThenBy(stats => stats.Identification);
-        return entries.Any() ? Formatter.Format(entries) : string.Empty;
+        return entries.Any() ? formatTable(entries) : string.Empty;
     }
 
     public abstract IEnumerable<ResultMap<TKey>> SelectKeys(Game game, IEnumerable<Player> players);
