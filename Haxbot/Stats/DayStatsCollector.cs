@@ -14,6 +14,8 @@ public class DayStatsCollector<TStatsCollector> : GroupedStatsCollector<DateTime
     {
     }
 
+    public override FlattenedGameStats Enrich(FlattenedGameStats stats, DateTime value) => stats with { Date = value };
+
     public override DateTime SelectKey(Game game) => game.Created.Date;
 
     public override string KeyToString(DateTime key) => key.ToString();

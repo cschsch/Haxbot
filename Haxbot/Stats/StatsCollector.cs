@@ -39,6 +39,11 @@ public abstract class StatsCollector<TKey> : IStatsCollector<TKey>
         return entries.Any() ? formatTable(entries) : string.Empty;
     }
 
+    public IEnumerable<FlattenedGameStats> Flatten()
+    {
+        return _stats.Select(kv => new FlattenedGameStats(kv.Value));
+    }
+
     public abstract IEnumerable<ResultMap<TKey>> SelectKeys(Game game, IEnumerable<Player> players);
     public abstract GameStats StatsFactory(ResultMap<TKey> resultMap);
 }

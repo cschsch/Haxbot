@@ -62,6 +62,10 @@ $@"{bannerHalf} {key} {bannerHalf}
         return string.Join(Environment.NewLine + Environment.NewLine, entries);
     }
 
+    public IEnumerable<FlattenedGameStats> Flatten() => 
+        _statsCollectors.SelectMany(kv => kv.Value.Flatten().Select(stats => Enrich(stats, kv.Key)));
+
+    public abstract FlattenedGameStats Enrich(FlattenedGameStats stats, TKey value);
     public abstract TKey SelectKey(Game game);
     public abstract string KeyToString(TKey key);
     public abstract IOrderedEnumerable<KeyValuePair<TKey, TStatsCollector>> OrderStatsCollectors(IEnumerable<KeyValuePair<TKey, TStatsCollector>> entries);

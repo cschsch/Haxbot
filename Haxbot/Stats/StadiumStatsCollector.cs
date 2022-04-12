@@ -16,6 +16,8 @@ public class StadiumStatsCollector<TStatsCollector> : GroupedStatsCollector<Stad
     {
     }
 
+    public override FlattenedGameStats Enrich(FlattenedGameStats stats, Stadium value) => stats with { Stadium = value };
+
     public override Stadium SelectKey(Game game) => new(game.Stadium);
 
     public override string KeyToString(Stadium key) => key.Name;

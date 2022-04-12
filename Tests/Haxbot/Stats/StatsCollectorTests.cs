@@ -2,6 +2,7 @@
 using Haxbot.Stats;
 using NUnit.Framework;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Tests.Haxbot.Stats;
@@ -94,10 +95,10 @@ public class StatsCollectorTests
         };
 
         var stats = new ConcurrentDictionary<Team, GameStats>();
-        var playerStatsCollector = new TeamStatsCollector(stats);
+        var teamStatsCollector = new TeamStatsCollector(stats);
 
         // act
-        playerStatsCollector.Register(game, red.Players.Concat(blue.Players));
+        teamStatsCollector.Register(game, red.Players.Concat(blue.Players));
 
         // assert
         Assert.AreEqual(1, stats[red].AmountWon);
@@ -118,10 +119,10 @@ public class StatsCollectorTests
         };
 
         var stats = new ConcurrentDictionary<Team, GameStats>();
-        var playerStatsCollector = new TeamStatsCollector(stats);
+        var teamStatsCollector = new TeamStatsCollector(stats);
 
         // act
-        playerStatsCollector.Register(game, red.Players.Take(1).Concat(blue.Players));
+        teamStatsCollector.Register(game, red.Players.Take(1).Concat(blue.Players));
 
         // assert
         Assert.IsFalse(stats.ContainsKey(red));
@@ -142,12 +143,26 @@ public class StatsCollectorTests
         };
 
         var stats = new ConcurrentDictionary<Team, GameStats>();
-        var playerStatsCollector = new TeamStatsCollector(stats);
+        var teamStatsCollector = new TeamStatsCollector(stats);
 
         // act
-        playerStatsCollector.Register(game, red.Players.Concat(blue.Players));
+        teamStatsCollector.Register(game, red.Players.Concat(blue.Players));
 
         // assert
         CollectionAssert.IsEmpty(stats);
+    }
+
+    [Test]
+    public void PlayerStatsCollector_Flatten_IsSameButFlattened()
+    {
+        // arrange
+        var stats = new GameStats { AmountWon = 5, AmountLost = 1, Identification = "haha" };
+        var playerStatsCollector = new PlayerStatsCollector(new ConcurrentDictionary<Player, GameStats>(new[] { new KeyValuePair<Player, GameStats>(new Player() { Name = "haha" }, stats) }));
+
+        // act
+        var result = playerStatsCollector.Flatten();
+
+        // assert
+        Assert.AreEqual(new FlattenedGameStats(stats), result.Single());
     }
 }
