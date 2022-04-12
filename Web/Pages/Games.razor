@@ -107,7 +107,15 @@
         <DataGridColumn Field="@nameof(GameModel.State)" Caption="State"/>
         <DataGridColumn Field="@nameof(GameModel.Replay)" Caption="Save Replay" Sortable="false" Filterable="false">
             <DisplayTemplate>
-                <Button Color="Color.Primary" Clicked="@(() => SaveReplay(context))"><Icon Name="IconName.Save"/></Button>
+                @{
+                    if (!string.IsNullOrWhiteSpace(context?.Replay))
+                    {
+                        <Button Color="Color.Primary" Clicked="@(() => SaveReplay(context))"><Icon Name="IconName.Save"/></Button>
+                    } else
+                    {
+                        <Button Color="Color.Danger"><Icon Name="IconName.TimesCircle"/></Button>
+                    }
+                }
             </DisplayTemplate>
         </DataGridColumn>
     </DataGridColumns>
