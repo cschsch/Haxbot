@@ -22,7 +22,7 @@ var configuration = new ConfigurationBuilder()
         .Build()
         .Get<Configuration>();
 
-builder.Services.AddSingleton<GamesService>(_ => new GamesService(new HaxbotContext(configuration)));
+builder.Services.Add(new ServiceDescriptor(typeof(GamesService), _ => new GamesService(new HaxbotContext(configuration)), ServiceLifetime.Transient));
 
 var app = builder.Build();
 
