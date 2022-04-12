@@ -125,7 +125,7 @@
 
     private async Task GetGames()
     {
-        _games = GamesService.GetGames(QueryModel).OrderByDescending(game => game.Created).ToArray();
+        _games = GamesService.GetGames(QueryModel).OrderByDescending(game => game.Created).Select(game => new GameModel(game)).ToArray();
         if (!_games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
     }
 }

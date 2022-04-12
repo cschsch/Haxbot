@@ -1,5 +1,6 @@
 ﻿using Haxbot;
 using Haxbot.Entities;
+using Haxbot.Stats;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Data;
@@ -13,7 +14,7 @@ public class GamesService
         Context = context;
     }
 
-    public IEnumerable<GameModel> GetGames(GamesQueryModel gamesQueryModel)
+    public IEnumerable<Game> GetGames(GamesQueryModel gamesQueryModel)
     {
         Team GetTeam(IQueryable<Player> players)
         {
@@ -29,7 +30,17 @@ public class GamesService
             .PlayedOn(gamesQueryModel.Stadium)
             .Where(game => game.State != GameState.Undecided || gamesQueryModel.Undecided)
             .Include(game => game.Red.Players).Include(game => game.Blue.Players);
-        Func<IQueryable<Game>, IQueryable<Game>> teamFilter = games => gamesQueryModel.Team ? games.WithTeam(GetTeam(players)) : games.WithAny(players);
-        return teamFilter(games).Select(game => new GameModel(game));
+        return gamesQueryModel.Team ? games.WithTeam(GetTeam(players)) : games.WithAny(players);
+    }
+
+    public IEnumerable<FlattenedGameStats> CollectStats<TBaseCollector>(IEnumerable<Game> games) 
+        where TBaseCollector : IStatsCollector, new()
+    {
+        var collector = new DayStatsCollector<StadiumStatsCollector<TBaseCollector>>();
+        foreach (var game in games)
+        {
+            collector.Register(game, Context.Players!);
+        }
+        return collector.Flatten();
     }
 }

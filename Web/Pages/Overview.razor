@@ -3,6 +3,7 @@
 <PageTitle>Overview</PageTitle>
 
 @using Haxbot.Entities
+@using Haxbot.Stats
 @using Web.Data
 @inject GamesService GamesService
 @inject INotificationService NotificationService
@@ -39,7 +40,7 @@
 
 @code {
     private GamesQueryModel QueryModel { get; } = new();
-    private GameModel[] _games = Array.Empty<GameModel>();
+    private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
     private bool _groupByTeam;
 
     protected override Task OnInitializedAsync()
@@ -49,7 +50,10 @@
 
     private async Task GetGames()
     {
-        _games = GamesService.GetGames(QueryModel).OrderByDescending(game => game.Created).ToArray();
-        if (!_games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
+        var games = GamesService.GetGames(QueryModel);
+        if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
+        _stats = _groupByTeam 
+            ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray() 
+            : GamesService.CollectStats<PlayerStatsCollector>(games).ToArray();
     }
 }
