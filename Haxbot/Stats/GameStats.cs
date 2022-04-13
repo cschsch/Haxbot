@@ -6,8 +6,8 @@ public record GameStats
     public int AmountWon { get; init; }
     public int AmountLost { get; init; }
     public int AmountPlayed => AmountWon + AmountLost;
-    public decimal Winrate => AmountPlayed == 0 ? -1 : Math.Round((decimal)AmountWon / AmountPlayed, 2);
-    public decimal WinLoseRatio => AmountLost == 0 ? -1 : Math.Round((decimal)AmountWon / AmountLost, 2);
+    public decimal Winrate => AmountPlayed == 0 ? -1 : (decimal)AmountWon / AmountPlayed * 100;
+    public decimal WinLoseRatio => AmountLost == 0 ? -1 : (decimal)AmountWon / AmountLost;
 
     public GameStats RegisterGame(GameResult result)
     {
