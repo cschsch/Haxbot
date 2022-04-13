@@ -36,40 +36,58 @@
 
 <Divider />
 
-<LineChart @ref="_dateChart" TItem="FlattenedGameStats" Options="_dateChartOptions"></LineChart>
+<Tabs RenderMode="TabsRenderMode.LazyLoad" SelectedTab="byDay">
+    <Items>
+        <Tab Name="byDay">By Day</Tab>
+    </Items>
+    <Content>
+        <TabPanel Name="byDay">
+            <Tabs SelectedTab="winrate" Margin="Margin.Is1.FromTop">
+                <Items>
+                    <Tab Name="winrate">Winrate</Tab>
+                    <Tab Name="amountPlayed">Amount played</Tab>
+                    <Tab Name="amountWon">Amount won</Tab>
+                    <Tab Name="amountLost">Amount lost</Tab>
+                </Items>
+                <Content>
+                    <TabPanel Name="winrate">
+                        <LineChart @ref="_lineCharts[0]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.Winrate), "Winrate (in %)")" />
+                    </TabPanel>
+                    <TabPanel Name="amountPlayed">
+                        <LineChart @ref="_lineCharts[1]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.AmountPlayed), "Amount played")" />
+                    </TabPanel>
+                    <TabPanel Name="amountWon">
+                        <LineChart @ref="_lineCharts[2]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.AmountWon), "Amount won")" />
+                    </TabPanel>
+                    <TabPanel Name="amountLost">
+                        <LineChart @ref="_lineCharts[3]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.AmountLost), "Amount lost")" />
+                    </TabPanel>
+                </Content>
+            </Tabs>
+        </TabPanel>
+    </Content>
+</Tabs>
 
 @code {
     private GamesQueryModel QueryModel { get; } = new();
     private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
     private bool _groupByTeam;
 
-    private LineChart<FlattenedGameStats> _dateChart = new();
-    private string _dateChartYAxisKey = nameof(FlattenedGameStats.Winrate);
-    private LineChartOptions _dateChartOptions = new()
-        {
-            Parsing = new ChartParsing
-            {
-                XAxisKey = nameof(FlattenedGameStats.Date).ToLower()
-            },
-            Scales = new ChartScales
-            {
-                Y = new ChartAxis
-                {
-                    Title = new ChartScaleTitle
-                    {
-                        Display = true
-                    }
-                }
-            }
-        };
+    private List<LineChart<FlattenedGameStats>> _lineCharts = new List<LineChart<FlattenedGameStats>>
+    {
+        new LineChart<FlattenedGameStats>(),
+        new LineChart<FlattenedGameStats>(),
+        new LineChart<FlattenedGameStats>(),
+        new LineChart<FlattenedGameStats>(),
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) await RedrawLineChart();
+        if (firstRender) await RedrawLineCharts();
     }
 
-    List<string> _lineChartColors = new List<string> 
-    { 
+    List<string> _lineChartColors = new List<string>
+    {
         ChartColor.FromRgba( 0, 0, 128, 1f ), // navy
         ChartColor.FromRgba( 220, 20, 60, 1f ), // crimson
         ChartColor.FromRgba( 128, 128, 0, 1f ), // olive
@@ -82,11 +100,28 @@
         ChartColor.FromRgba( 255, 215, 0, 1f ) // gold
     };
 
-    private async Task RedrawLineChart()
+    private LineChartOptions CreateOptions(string yAxisKey, string yAxisName) => new LineChartOptions
+        {
+            Parsing = new ChartParsing
+            {
+                XAxisKey = nameof(FlattenedGameStats.Date).ToLower(),
+                YAxisKey = yAxisKey.ToCamelCase()
+            },
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Title = new ChartScaleTitle
+                    {
+                        Display = true,
+                        Text = yAxisName
+                    }
+                }
+            }
+        };
+
+    private async Task RedrawLineCharts()
     {
-        await _dateChart.Clear();
-        _dateChartOptions.Parsing.YAxisKey = _dateChartYAxisKey.ToCamelCase();
-        _dateChartOptions.Scales.Y.Title.Text = _dateChartYAxisKey;
         var datasets = _stats
             .GroupBy(stat => stat.Identification)
             .Zip(_lineChartColors.Cycle())
@@ -100,16 +135,21 @@
                     CubicInterpolationMode = "default",
                     Fill = false
                 }).ToArray();
-        await _dateChart.AddDatasetsAndUpdate(datasets.ToArray());
+
+        foreach (var chart in _lineCharts)
+        {
+            await chart.Clear();
+            await chart.AddDatasetsAndUpdate(datasets);
+        }
     }
 
     private async Task GetGames()
     {
         var games = GamesService.GetGames(QueryModel);
         if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
-        _stats = _groupByTeam 
-            ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray() 
+        _stats = _groupByTeam
+            ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray()
             : GamesService.CollectStats<PlayerStatsCollector>(games).ToArray();
-        await RedrawLineChart();
+        await RedrawLineCharts();
     }
 }
