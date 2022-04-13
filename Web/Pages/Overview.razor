@@ -36,16 +36,71 @@
 
 <Divider />
 
-
+<LineChart @ref="_dateChart" TItem="FlattenedGameStats" Options="_dateChartOptions"></LineChart>
 
 @code {
     private GamesQueryModel QueryModel { get; } = new();
     private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
     private bool _groupByTeam;
 
-    protected override Task OnInitializedAsync()
+    private LineChart<FlattenedGameStats> _dateChart = new();
+    private string _dateChartYAxisKey = nameof(FlattenedGameStats.Winrate);
+    private LineChartOptions _dateChartOptions = new()
+        {
+            Parsing = new ChartParsing
+            {
+                XAxisKey = nameof(FlattenedGameStats.Date).ToLower()
+            },
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Title = new ChartScaleTitle
+                    {
+                        Display = true
+                    }
+                }
+            }
+        };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        return base.OnInitializedAsync();
+        if (firstRender) await RedrawLineChart();
+    }
+
+    List<string> _lineChartColors = new List<string> 
+    { 
+        ChartColor.FromRgba( 0, 0, 128, 1f ), // navy
+        ChartColor.FromRgba( 220, 20, 60, 1f ), // crimson
+        ChartColor.FromRgba( 128, 128, 0, 1f ), // olive
+        ChartColor.FromRgba( 0, 139, 139, 1f ), // darkcyan
+        ChartColor.FromRgba( 139, 0, 139, 1f ), // darkmagenta
+        ChartColor.FromRgba( 47, 79, 79, 1f ),  // darkslategray
+        ChartColor.FromRgba( 255, 105, 180, 1f ), // hotpink
+        ChartColor.FromRgba( 127, 255, 212, 1f ), // aquamarine
+        ChartColor.FromRgba( 0, 100, 0, 1f ), // darkgreen
+        ChartColor.FromRgba( 255, 215, 0, 1f ) // gold
+    };
+
+    private async Task RedrawLineChart()
+    {
+        await _dateChart.Clear();
+        _dateChartOptions.Parsing.YAxisKey = _dateChartYAxisKey.ToCamelCase();
+        _dateChartOptions.Scales.Y.Title.Text = _dateChartYAxisKey;
+        var datasets = _stats
+            .GroupBy(stat => stat.Identification)
+            .Zip(_lineChartColors.Cycle())
+            .Select(groupColors => new LineChartDataset<FlattenedGameStats>
+                {
+                    Label = groupColors.First.Key,
+                    Data = groupColors.First.OrderBy(stat => stat.Date).Scan((acc, cur) => acc.Add(cur)).ToList(),
+                    BackgroundColor = groupColors.Second,
+                    BorderColor = groupColors.Second,
+                    BorderWidth = 2,
+                    CubicInterpolationMode = "default",
+                    Fill = false
+                }).ToArray();
+        await _dateChart.AddDatasetsAndUpdate(datasets.ToArray());
     }
 
     private async Task GetGames()
@@ -55,5 +110,6 @@
         _stats = _groupByTeam 
             ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray() 
             : GamesService.CollectStats<PlayerStatsCollector>(games).ToArray();
+        await RedrawLineChart();
     }
 }

@@ -36,7 +36,7 @@ public class GamesService
     public IEnumerable<FlattenedGameStats> CollectStats<TBaseCollector>(IEnumerable<Game> games) 
         where TBaseCollector : IStatsCollector, new()
     {
-        var collector = new DayStatsCollector<StadiumStatsCollector<TBaseCollector>>();
+        var collector = new DayStatsCollector<TBaseCollector>();
         foreach (var game in games)
         {
             collector.Register(game, Context.Players!);
