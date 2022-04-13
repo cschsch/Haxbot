@@ -10,8 +10,8 @@
 <Divider DividerType="DividerType.Dotted" @bind-Visibility="HasPlayerFilter" />
 <Field Horizontal>
     <FieldBody ColumnSize="ColumnSize.Is11">
-        <Tooltip Text="Must be a full, case-sensitive match">
-            <TextEdit Placeholder="Name or auth of player..." @bind-Text="_playerFilterText" KeyPress="args => AddPlayerFilter(args)" />
+        <Tooltip Text="Case-sensitive full match">
+            <TextEdit Placeholder="Name of player..." @bind-Text="_playerFilterText" KeyPress="args => AddPlayerFilter(args)" />
         </Tooltip>
     </FieldBody>
     <Button Color=Color.Primary Clicked="AddPlayerFilter">Add</Button>
