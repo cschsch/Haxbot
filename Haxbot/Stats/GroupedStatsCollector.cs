@@ -62,8 +62,15 @@ $@"{bannerHalf} {key} {bannerHalf}
         return string.Join(Environment.NewLine + Environment.NewLine, entries);
     }
 
-    public IEnumerable<FlattenedGameStats> Flatten() => 
-        _statsCollectors.SelectMany(kv => kv.Value.Flatten().Select(stats => Enrich(stats, kv.Key)));
+    public IEnumerable<FlattenedGameStats> Flatten() 
+    {
+        return _statsCollectors
+            .SelectMany(kv => kv.Value
+                .Flatten()
+                .Select(stats => Enrich(stats, kv.Key))
+                .GroupBy(stats => stats.Identification)
+                .Select(group => group.Aggregate((cur, acc) => cur.Add(acc))));
+    }
 
     public abstract FlattenedGameStats Enrich(FlattenedGameStats stats, TKey value);
     public abstract TKey SelectKey(Game game);
