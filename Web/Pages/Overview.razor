@@ -3,6 +3,7 @@
 <PageTitle>Overview</PageTitle>
 
 @using Haxbot.Entities
+@using Haxbot.Extensions
 @using Haxbot.Stats
 @using Web.Data
 @inject GamesService GamesService
@@ -36,13 +37,15 @@
 
 <Divider />
 
-<Tabs RenderMode="TabsRenderMode.LazyLoad" SelectedTab="byDay">
+<Tabs @bind-SelectedTab="_selectedMainTab">
     <Items>
-        <Tab Name="byDay">By Day</Tab>
+        <Tab Name="cumulative">Cumulative</Tab>
+        <Tab Name="absolute">Absolute</Tab>
+        <Tab Name="relative">Relative</Tab>
     </Items>
     <Content>
-        <TabPanel Name="byDay">
-            <Tabs SelectedTab="winrate" Margin="Margin.Is1.FromTop">
+        <TabPanel Name="cumulative">
+            <Tabs Margin="Margin.Is1.FromTop" @bind-SelectedTab="_selectedSubTabs[0]">
                 <Items>
                     <Tab Name="winrate">Winrate</Tab>
                     <Tab Name="amountPlayed">Amount played</Tab>
@@ -51,16 +54,64 @@
                 </Items>
                 <Content>
                     <TabPanel Name="winrate">
-                        <LineChart @ref="_lineCharts[0]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.Winrate), "Winrate (in %)")" />
+                        <LineChart @ref="_lineCharts[0]" TItem="FlattenedGameStats" Options="@(CreateOptions<LineChartOptions>(nameof(FlattenedGameStats.Date), nameof(FlattenedGameStats.Winrate), "Winrate (in %)", true))" />
                     </TabPanel>
                     <TabPanel Name="amountPlayed">
-                        <LineChart @ref="_lineCharts[1]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.AmountPlayed), "Amount played")" />
+                        <LineChart @ref="_lineCharts[1]" TItem="FlattenedGameStats" Options="@(CreateOptions<LineChartOptions>(nameof(FlattenedGameStats.Date), nameof(FlattenedGameStats.AmountPlayed), "Amount played", true))" />
                     </TabPanel>
                     <TabPanel Name="amountWon">
-                        <LineChart @ref="_lineCharts[2]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.AmountWon), "Amount won")" />
+                        <LineChart @ref="_lineCharts[2]" TItem="FlattenedGameStats" Options="@(CreateOptions<LineChartOptions>(nameof(FlattenedGameStats.Date), nameof(FlattenedGameStats.AmountWon), "Amount won", true))" />
                     </TabPanel>
                     <TabPanel Name="amountLost">
-                        <LineChart @ref="_lineCharts[3]" TItem="FlattenedGameStats" Options="@CreateOptions(nameof(FlattenedGameStats.AmountLost), "Amount lost")" />
+                        <LineChart @ref="_lineCharts[3]" TItem="FlattenedGameStats" Options="@(CreateOptions<LineChartOptions>(nameof(FlattenedGameStats.Date), nameof(FlattenedGameStats.AmountLost), "Amount lost", true))" />
+                    </TabPanel>
+                </Content>
+            </Tabs>
+        </TabPanel>
+        <TabPanel Name="absolute">
+            <Tabs Margin="Margin.Is1.FromTop" @bind-SelectedTab="_selectedSubTabs[1]">
+                <Items>
+                    <Tab Name="winrate">Winrate</Tab>
+                    <Tab Name="amountPlayed">Amount played</Tab>
+                    <Tab Name="amountWon">Amount won</Tab>
+                    <Tab Name="amountLost">Amount lost</Tab>
+                </Items>
+                <Content>
+                    <TabPanel Name="winrate">
+                        <BarChart @ref="_barCharts[0]" TItem="FlattenedGameStats" Options="@(CreateOptions<BarChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.Winrate), "Winrate (in %)"))" />
+                    </TabPanel>
+                    <TabPanel Name="amountPlayed">
+                        <BarChart @ref="_barCharts[1]" TItem="FlattenedGameStats" Options="@(CreateOptions<BarChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.AmountPlayed), "Amount played"))" />
+                    </TabPanel>
+                    <TabPanel Name="amountWon">
+                        <BarChart @ref="_barCharts[2]" TItem="FlattenedGameStats" Options="@(CreateOptions<BarChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.AmountWon), "Amount won"))" />
+                    </TabPanel>
+                    <TabPanel Name="amountLost">
+                        <BarChart @ref="_barCharts[3]" TItem="FlattenedGameStats" Options="@(CreateOptions<BarChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.AmountLost), "Amount lost"))" />
+                    </TabPanel>
+                </Content>
+            </Tabs>
+        </TabPanel>
+        <TabPanel Name="relative">
+            <Tabs Margin="Margin.Is1.FromTop" @bind-SelectedTab="_selectedSubTabs[2]">
+                <Items>
+                    <Tab Name="winrate">Winrate</Tab>
+                    <Tab Name="amountPlayed">Amount played</Tab>
+                    <Tab Name="amountWon">Amount won</Tab>
+                    <Tab Name="amountLost">Amount lost</Tab>
+                </Items>
+                <Content>
+                    <TabPanel Name="winrate">
+                        <PieChart @ref="_pieCharts[0].Chart" TItem="decimal" Options="@(CreateOptions<PieChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.Winrate), "Winrate (in %)"))" />
+                    </TabPanel>
+                    <TabPanel Name="amountPlayed">
+                        <PieChart @ref="_pieCharts[1].Chart" TItem="decimal" Options="@(CreateOptions<PieChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.AmountPlayed), "Amount played"))" />
+                    </TabPanel>
+                    <TabPanel Name="amountWon">
+                        <PieChart @ref="_pieCharts[2].Chart" TItem="decimal" Options="@(CreateOptions<PieChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.AmountWon), "Amount won"))" />
+                    </TabPanel>
+                    <TabPanel Name="amountLost">
+                        <PieChart @ref="_pieCharts[3].Chart" TItem="decimal" Options="@(CreateOptions<PieChartOptions>(nameof(FlattenedGameStats.Identification), nameof(FlattenedGameStats.AmountLost), "Amount lost"))" />
                     </TabPanel>
                 </Content>
             </Tabs>
@@ -72,39 +123,58 @@
     private GamesQueryModel QueryModel { get; } = new();
     private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
     private bool _groupByTeam;
+    private string _selectedMainTab = "cumulative";
+    private List<string> _selectedSubTabs = new List<string>
+    {
+        "winrate",
+        "winrate",
+        "winrate"
+    };
 
     private List<LineChart<FlattenedGameStats>> _lineCharts = new List<LineChart<FlattenedGameStats>>
     {
-        new LineChart<FlattenedGameStats>(),
-        new LineChart<FlattenedGameStats>(),
-        new LineChart<FlattenedGameStats>(),
-        new LineChart<FlattenedGameStats>(),
+        new(),
+        new(),
+        new(),
+        new()
     };
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private List<BarChart<FlattenedGameStats>> _barCharts = new List<BarChart<FlattenedGameStats>>
     {
-        if (firstRender) await RedrawLineCharts();
+        new(),
+        new(),
+        new(),
+        new()
+    };
+
+    private record PieChartWithSelector
+    {
+        public PieChart<decimal> Chart { get; set; }
+        public Func<FlattenedGameStats, decimal> Selector { get; }
+
+        public PieChartWithSelector(PieChart<decimal> chart, Func<FlattenedGameStats, decimal> selector)
+        {
+            Chart = chart;
+            Selector = selector;
+        }
     }
 
-    List<string> _lineChartColors = new List<string>
+    private List<PieChartWithSelector> _pieCharts = new List<PieChartWithSelector>
     {
-        ChartColor.FromRgba( 0, 0, 128, 1f ), // navy
-        ChartColor.FromRgba( 220, 20, 60, 1f ), // crimson
-        ChartColor.FromRgba( 128, 128, 0, 1f ), // olive
-        ChartColor.FromRgba( 0, 139, 139, 1f ), // darkcyan
-        ChartColor.FromRgba( 139, 0, 139, 1f ), // darkmagenta
-        ChartColor.FromRgba( 47, 79, 79, 1f ),  // darkslategray
-        ChartColor.FromRgba( 255, 105, 180, 1f ), // hotpink
-        ChartColor.FromRgba( 127, 255, 212, 1f ), // aquamarine
-        ChartColor.FromRgba( 0, 100, 0, 1f ), // darkgreen
-        ChartColor.FromRgba( 255, 215, 0, 1f ) // gold
+        new(new(), stats => stats.Winrate),
+        new(new(), stats => stats.AmountPlayed),
+        new(new(), stats => stats.AmountWon),
+        new(new(), stats => stats.AmountLost)
     };
 
-    private LineChartOptions CreateOptions(string yAxisKey, string yAxisName) => new LineChartOptions
+    private TChartOptions CreateOptions<TChartOptions>(string xAxisKey, string yAxisKey, string yAxisName, bool timeSeries = false)
+        where TChartOptions : ChartOptions, new()
+    {
+        var options = new TChartOptions()
         {
             Parsing = new ChartParsing
             {
-                XAxisKey = nameof(FlattenedGameStats.Date).ToLower(),
+                XAxisKey = xAxisKey.ToCamelCase(),
                 YAxisKey = yAxisKey.ToCamelCase()
             },
             Scales = new ChartScales
@@ -119,12 +189,48 @@
                 }
             }
         };
+        if (timeSeries)
+        {
+            options.Scales.X = new ChartAxis
+            {
+                Type = "timeseries"
+            };
+        }
+        return options;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RedrawCharts();
+        }
+    }
+
+    private List<string> _chartColors = new List<string>
+    {
+        ChartColor.FromRgba( 0, 0, 128, 1f ), // navy
+        ChartColor.FromRgba( 220, 20, 60, 1f ), // crimson
+        ChartColor.FromRgba( 128, 128, 0, 1f ), // olive
+        ChartColor.FromRgba( 0, 139, 139, 1f ), // darkcyan
+        ChartColor.FromRgba( 139, 0, 139, 1f ), // darkmagenta
+        ChartColor.FromRgba( 47, 79, 79, 1f ),  // darkslategray
+        ChartColor.FromRgba( 255, 105, 180, 1f ), // hotpink
+        ChartColor.FromRgba( 127, 255, 212, 1f ), // aquamarine
+        ChartColor.FromRgba( 0, 100, 0, 1f ), // darkgreen
+        ChartColor.FromRgba( 255, 215, 0, 1f ) // gold
+    };
+
+    private Task RedrawCharts()
+    {
+        return Task.WhenAll(RedrawLineCharts(), RedrawBarCharts(), RedrawPieCharts());
+    }
 
     private async Task RedrawLineCharts()
     {
         var datasets = _stats
             .GroupBy(stat => stat.Identification)
-            .Zip(_lineChartColors.Cycle())
+            .Zip(_chartColors.Cycle())
             .Select(groupColors => new LineChartDataset<FlattenedGameStats>
                 {
                     Label = groupColors.First.Key,
@@ -143,6 +249,47 @@
         }
     }
 
+    private async Task RedrawBarCharts()
+    {
+        var datasets = _stats
+            .GroupBy(stat => stat.Identification)
+            .Select(group => group.Aggregate((acc, cur) => acc.Add(cur)))
+            .Zip(_chartColors.Cycle())
+            .Select(statColors => new BarChartDataset<FlattenedGameStats>
+                {
+                    Label = statColors.First.Identification,
+                    Data = new List<FlattenedGameStats> { statColors.First },
+                    BackgroundColor = statColors.Second,
+                    BorderColor = statColors.Second,
+                    BorderWidth = 2
+                }).ToArray();
+
+        foreach (var chart in _barCharts)
+        {
+            await chart.Clear();
+            await chart.AddDatasetsAndUpdate(datasets);
+        }
+    }
+
+    private async Task RedrawPieCharts()
+    {
+        var byIdentification = _stats.GroupBy(stat => stat.Identification).ToArray();
+        var names = byIdentification.Select(group => group.Key).ToArray();
+        var values = byIdentification.Select(group => group.Aggregate((acc, cur) => acc.Add(cur))).ToArray();
+
+        foreach (var chartWithSelector in _pieCharts)
+        {
+            await chartWithSelector.Chart.Clear();
+            var data = values.Select(chartWithSelector.Selector).ToList();
+            var dataset = new PieChartDataset<decimal>()
+                {
+                    Data = data,
+                    BackgroundColor = _chartColors
+                };
+            await chartWithSelector.Chart.AddLabelsDatasetsAndUpdate(names, dataset);
+        }
+    }
+
     private async Task GetGames()
     {
         var games = GamesService.GetGames(QueryModel);
@@ -150,6 +297,6 @@
         _stats = _groupByTeam
             ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray()
             : GamesService.CollectStats<PlayerStatsCollector>(games).ToArray();
-        await RedrawLineCharts();
+        await RedrawCharts();
     }
 }
