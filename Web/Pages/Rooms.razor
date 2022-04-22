@@ -1,5 +1,73 @@
-﻿<h3>Rooms</h3>
+﻿@page "/rooms"
+
+<PageTitle>Rooms</PageTitle>
+
+@using Haxbot.Entities
+@using Haxbot.Settings
+@using Web.Data
+@inject Configuration BaseConfiguration
+@inject GamesService GamesService
+@inject INotificationService NotificationService
+
+<Heading Size="HeadingSize.Is1">Rooms</Heading>
+
+<Paragraph>Create or join Haxball rooms. Creating a room requires a token, acquirable <Link href="https://www.haxball.com/headlesstoken" Target="Target.Blank">here</Link>.</Paragraph>
+
+<Row Gutter="(32, 16)">
+    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
+        <Heading Size="HeadingSize.Is6">Room configuration</Heading>
+        <Divider />
+        <Field Horizontal>
+            <FieldLabel ColumnSize="ColumnSize.Is2">Name of room</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is10">
+                <TextEdit @bind-Text="_roomName"></TextEdit>
+            </FieldBody>
+        </Field>
+        <Divider />
+        <Check @bind-Checked="_public" TValue="bool">Make room public</Check>
+        <Divider />
+        <Field Horizontal>
+            <FieldLabel ColumnSize="ColumnSize.Is3">Time limit in minutes</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is9">
+                <NumericPicker @bind-Value="_timeLimit" TValue="int" Min="1" />
+            </FieldBody>
+        </Field>
+        <Divider />
+        <Field Horizontal>
+            <FieldLabel ColumnSize="ColumnSize.Is2">Room admins</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is10">
+                <Select TValue="string" Multiple @bind-SelectedValues="@_selectedAuths">
+                    @foreach (var player in GamesService.GetPlayers().OrderBy(player => player.Name))
+                    {
+                        <SelectItem Value="player.Auth">@player.Name</SelectItem>
+                    }
+                </Select>
+            </FieldBody>
+        </Field>
+        <Divider />
+        <TextEdit @bind-Text="_token" @onchange="(args => _buttonDisabled = string.IsNullOrWhiteSpace(args.Value as string))" Placeholder="Token"></TextEdit>
+    </Column>
+    <Column Margin="Margin.Is1">
+        <Button Size="Size.Large" Disabled="@_buttonDisabled" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Creating room...")!)" Color="Color.Primary">Create</Button>
+    </Column>
+</Row>
+
+<Divider />
 
 @code {
+    private string _roomName = string.Empty;
+    private bool _public;
+    private int _timeLimit = 1;
+    private IReadOnlyList<string> _selectedAuths = Array.Empty<string>();
+    private string _token = string.Empty;
+    private bool _buttonDisabled = true;
 
+    protected override Task OnInitializedAsync()
+    {
+        _roomName = BaseConfiguration.RoomConfiguration.RoomName;
+        _public = BaseConfiguration.RoomConfiguration.Public;
+        _timeLimit = BaseConfiguration.RoomConfiguration.TimeLimit;
+        _selectedAuths = BaseConfiguration.RoomAdmins;
+        return base.OnInitializedAsync();
+    }
 }

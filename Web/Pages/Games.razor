@@ -25,7 +25,7 @@
         <MiscFilter WithUndecided QueryModel="QueryModel" />
     </Column>
     <Column Margin="Margin.Is1" >
-        <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Searching for games...", "Searching...")!.ContinueWith(_ => GetGames())!)" Color="Color.Primary">Search</Button>
+        <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames())!)" Color="Color.Primary">Search</Button>
     </Column>
 </Row>
 
@@ -93,11 +93,6 @@
 @code {
     private GamesQueryModel QueryModel { get; } = new();
     private GameModel[] _games = Array.Empty<GameModel>();
-
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
 
     private bool PlayerNameFilter(object itemValue, object searchValue)
     {

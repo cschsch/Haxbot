@@ -43,4 +43,9 @@ public class GamesService
         }
         return collector.Flatten();
     }
+
+    public IEnumerable<Player> GetPlayers()
+    {
+        return Context.Players!.AsNoTracking();
+    }
 }
