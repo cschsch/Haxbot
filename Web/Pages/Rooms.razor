@@ -7,7 +7,9 @@
 @using Web.Data
 @inject Configuration BaseConfiguration
 @inject GamesService GamesService
+@inject RoomsService RoomsService
 @inject INotificationService NotificationService
+@inject IMessageService MessageService
 
 <Heading Size="HeadingSize.Is1">Rooms</Heading>
 
@@ -45,20 +47,46 @@
             </FieldBody>
         </Field>
         <Divider />
+        <TextEdit @bind-Text="_password" Placeholder="Password"></TextEdit>
+        <Divider />
         <TextEdit @bind-Text="_token" @onchange="(args => _buttonDisabled = string.IsNullOrWhiteSpace(args.Value as string))" Placeholder="Token"></TextEdit>
     </Column>
     <Column Margin="Margin.Is1">
-        <Button Size="Size.Large" Disabled="@_buttonDisabled" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Creating room...")!)" Color="Color.Primary">Create</Button>
+        <Button Size="Size.Large" Disabled="_buttonDisabled" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Creating room...")!.ContinueWith(_ => CreateRoom())!)" Color="Color.Primary">Create</Button>
     </Column>
 </Row>
 
 <Divider />
+
+<DataGrid TItem="Room"
+          Data="RoomsService.Rooms"
+          Responsive
+          Filterable FilterMethod="DataGridFilterMethod.Contains"
+          Sortable SortMode="DataGridSortMode.Single"
+          Resizable ResizeMode="TableResizeMode.Columns">
+    <DataGridColumns>
+        <DataGridColumn Field="RoomConfiguration.RoomName" Caption="Name" />
+        <DataGridColumn Field="RoomConfiguration.TimeLimit" Caption="Time limit" />
+        <DataGridCheckColumn Field="RoomConfiguration.Public" Caption="Public" />
+        <DataGridColumn Field="RoomConfiguration.Password" Caption="Password" Filterable="false">
+            <DisplayTemplate>
+                <Check Checked="@(!string.IsNullOrEmpty((context as Room)!.RoomConfiguration.Password))" Disabled />
+            </DisplayTemplate>
+        </DataGridColumn>
+        <DataGridColumn Field="Url" Caption="Url">
+            <DisplayTemplate>
+                <Link href="@((context as Room)!.Url)" Target="Target.Blank">@((context as Room)!.Url)</Link>
+            </DisplayTemplate>
+        </DataGridColumn>
+    </DataGridColumns>
+</DataGrid>
 
 @code {
     private string _roomName = string.Empty;
     private bool _public;
     private int _timeLimit = 1;
     private IReadOnlyList<string> _selectedAuths = Array.Empty<string>();
+    private string? _password;
     private string _token = string.Empty;
     private bool _buttonDisabled = true;
 
@@ -69,5 +97,32 @@
         _timeLimit = BaseConfiguration.RoomConfiguration.TimeLimit;
         _selectedAuths = BaseConfiguration.RoomAdmins;
         return base.OnInitializedAsync();
+    }
+
+    private async Task CreateRoom()
+    {
+        var roomConfiguration = BaseConfiguration.RoomConfiguration with
+        {
+            RoomName = _roomName,
+            Password = string.IsNullOrWhiteSpace(_password) ? null : _password,
+            Public = _public,
+            TimeLimit = _timeLimit
+        };
+        var configuration = BaseConfiguration with
+        {
+            RoomAdmins = _selectedAuths.ToArray(),
+            RoomConfiguration = roomConfiguration
+        };
+
+        string url;
+        try
+        {
+            url = await RoomsService.CreateRoom(configuration, _token);
+        } catch (Exception exc)
+        {
+            await MessageService.Error(exc.Message, "Failed to create room!");
+            return;
+        }
+        await MessageService.Success(url, "Your room has successfully been created!");
     }
 }
