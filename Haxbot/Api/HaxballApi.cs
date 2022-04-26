@@ -4,7 +4,7 @@ using PuppeteerSharp;
 
 namespace Haxbot.Api;
 
-public class HaxballApi
+public class HaxballApi : IDisposable
 {
     public string? Token { get; }
     public Page Page { get; }
@@ -19,7 +19,7 @@ public class HaxballApi
         Configuration = configuration;
     }
 
-    public async Task<string> CreateRoomAsync()
+    public async Task<string> CreateRoomAsync(int timeOut = 0)
     {
         await Page.GoToAsync(Configuration.HaxballHeadlessUrl, WaitUntilNavigation.Networkidle2);
         await ExposeFunctions();
@@ -75,7 +75,7 @@ public class HaxballApi
         return await Page
             .Frames
             .Single(frame => frame != Page.MainFrame)
-            .WaitForSelectorAsync("#roomlink a")
+            .WaitForSelectorAsync("#roomlink a", new WaitForSelectorOptions { Timeout = timeOut })
             .Bind(handle => handle.GetPropertyAsync("href"))
             .Map(handle => handle.RemoteObject.Value.ToString());
     }
@@ -89,5 +89,11 @@ public class HaxballApi
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
         var exposeSaveReplay = Page.ExposeFunctionAsync<string, object>("saveReplay", base64 => { ApiFunctions.SaveReplay(base64); return default!; });
         await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeHandleCommand, exposeSaveReplay);
+    }
+
+    public void Dispose()
+    {
+        ApiFunctions.CloseRoom();
+        Page.CloseAsync().Wait();
     }
 }
