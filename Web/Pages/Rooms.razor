@@ -67,7 +67,11 @@
     <DataGridColumns>
         <DataGridColumn Field="RoomConfiguration.RoomName" Caption="Name" />
         <DataGridColumn Field="RoomConfiguration.TimeLimit" Caption="Time limit" />
-        <DataGridCheckColumn Field="RoomConfiguration.Public" Caption="Public" />
+        <DataGridColumn Field="RoomConfiguration.Public" Caption="Public" Filterable="false">
+            <DisplayTemplate>
+                <Check Checked="@((context as Room)!.RoomConfiguration.Public)" Disabled/>
+            </DisplayTemplate>
+        </DataGridColumn>
         <DataGridColumn Field="RoomConfiguration.Password" Caption="Password" Filterable="false">
             <DisplayTemplate>
                 <Check Checked="@(!string.IsNullOrEmpty((context as Room)!.RoomConfiguration.Password))" Disabled />
