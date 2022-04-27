@@ -9,3 +9,7 @@ For recording (and querying) purposes Entity Framework is being used in conjunct
 
 To use Haxbot, there is a command line tool for querying, and for room creation purposes.
 It contains a plethora of options and a help command for each action you can take.
+
+# Web
+
+Web interface to query for previously played games, downloading their replays, displaying statistics using graphs, and creating rooms.
