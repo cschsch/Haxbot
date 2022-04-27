@@ -93,7 +93,6 @@ public class HaxballApi : IDisposable
 
     public void Dispose()
     {
-        ApiFunctions.CloseRoom();
         Page.CloseAsync().Wait();
     }
 }

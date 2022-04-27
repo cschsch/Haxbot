@@ -43,9 +43,9 @@ public class RoomsService
 
         apiFunctions.RoomClosed += (sender, args) =>
         {
-            api.Dispose();
             var room = Rooms.Single(room => room.Url == url);
             lock (Rooms) Rooms.Remove(room);
+            api.Dispose();
         };
 
         var room = new Room(url, configuration.RoomAdmins, configuration.RoomConfiguration);
