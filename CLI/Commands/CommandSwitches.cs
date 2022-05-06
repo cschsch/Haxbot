@@ -23,6 +23,7 @@ public static class CommandSwitches
         { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.Password)}", new [] { "--password", "-p" } },
         { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.Public)}", new [] { "--public" } },
         { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.NoPlayer)}", new [] { "--no-player" } },
-        { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.TimeLimit)}", new [] { "--time-limit" } }
+        { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.TimeLimit)}", new [] { "--time-limit" } },
+        { nameof(Configuration.Headless), new [] { "--headless", "-h" } }
     };
 }

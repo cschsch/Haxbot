@@ -12,7 +12,7 @@ public class RoomsService
 
     private async Task InitBrowser(Configuration configuration)
     {
-        var options = new LaunchOptions { Args = configuration.ChromiumArgs, Headless = true };
+        var options = new LaunchOptions { Args = configuration.ChromiumArgs, Headless = configuration.Headless };
         await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
         Browser = await Puppeteer.LaunchAsync(options);
     }

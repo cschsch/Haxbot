@@ -22,13 +22,13 @@ public class HaxbotApp
         if (!Directory.Exists(Path.GetDirectoryName(Configuration.DatabasePath))) Directory.CreateDirectory(Configuration.DatabasePath);
     }
 
-    public async Task CreateRoom(string? token, bool headless)
+    public async Task CreateRoom(string? token)
     {
-        if (string.IsNullOrWhiteSpace(token) && headless) throw new ArgumentException("Token cannot be empty in headless mode!");
+        if (string.IsNullOrWhiteSpace(token) && Configuration.Headless) throw new ArgumentException("Token cannot be empty in headless mode!");
 
         var cancellationTokenSource = new CancellationTokenSource();
 
-        var options = new LaunchOptions { Args = Configuration.ChromiumArgs, Headless = headless };
+        var options = new LaunchOptions { Args = Configuration.ChromiumArgs, Headless = Configuration.Headless };
         await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
         var browser = await Puppeteer.LaunchAsync(options);
         var page = await browser.NewPageAsync();

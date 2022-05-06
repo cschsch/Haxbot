@@ -29,12 +29,12 @@ public static class CommandFactories
             new Option<string>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.Password)}"], () => configuration.RoomConfiguration.Password ?? "<none>", "Password to be assigned to room"),
             new Option<bool>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.Public)}"], () => configuration.RoomConfiguration.Public, "Whether to make the room public"),
             new Option<bool>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.NoPlayer)}"], () => configuration.RoomConfiguration.NoPlayer, "Set to false if you wish the bot to join. Required for command handling."),
-            new Option<int>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.TimeLimit)}"], () => configuration.RoomConfiguration.TimeLimit, "Set time limit of games played")
+            new Option<int>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.TimeLimit)}"], () => configuration.RoomConfiguration.TimeLimit, "Set time limit of games played"),
+            new Option<bool>(CommandSwitches.CreateRoomSwitches[nameof(Configuration.Headless)], () => configuration.Headless, "Whether to run the browser headless or not.")
         };
         var tokenOption = new Option<string?>(new[] { "--token", "-t" }, "Haxball API token. Required if headless. Obtain here: https://www.haxball.com/headlesstoken");
-        var headlessOption = new Option<bool>("--headless", () => false, "Whether to run the browser headless or not.");
-        createCommand.AddOptions(tokenOption, headlessOption);
-        createCommand.SetHandler((string? token, bool headless) => app.CreateRoom(token, headless), tokenOption, headlessOption);
+        createCommand.AddOptions(tokenOption);
+        createCommand.SetHandler((string? token) => app.CreateRoom(token), tokenOption);
         return createCommand;
     }
 

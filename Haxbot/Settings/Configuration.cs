@@ -12,6 +12,7 @@ public record Configuration
     public string[] RoomAdmins { get; init; }
     public string BotOwner { get; init; }
     public string[] StandardOverviewCommands { get; init; }
+    public bool Headless { get; init; }
 
     [JsonIgnore]
     public string ConnectionString => string.Format(ConnectionStringTemplate, new[] { DatabasePath });
