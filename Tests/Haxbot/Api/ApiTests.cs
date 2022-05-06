@@ -58,7 +58,7 @@ HBInit = roomConfiguration => {{
     public async Task CreateRoom_ReturnsLinkAfterInit()
     {
         var page = await SetUpPage();
-        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Configuration, page, string.Empty);
+        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         var result = await api.CreateRoomAsync();
 
@@ -70,7 +70,7 @@ HBInit = roomConfiguration => {{
     {
         var expected = "token";
         var page = await SetUpPage();
-        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Configuration, page, expected);
+        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Mock.Of<IPartyManager>(), Configuration, page, expected);
 
         await api.CreateRoomAsync();
         var result = await page.EvaluateExpressionAsync<string>("window.room.token");
@@ -83,9 +83,9 @@ HBInit = roomConfiguration => {{
     {
         // arrange
         var auth = "admin";
-        var page = await SetUpPage("_ => { return { setPlayerAdmin: (id, value) => window.admin = value }; }");
+        var page = await SetUpPage("_ => { return { setPlayerAdmin: (id, value) => window.admin = value, getPlayerList: () => [] }; }");
         var configuration = Configuration with { RoomAdmins = new [] { auth } };
-        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), configuration, page, string.Empty);
+        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Mock.Of<IPartyManager>(partyManager => partyManager.RoundRobin(It.IsAny<HaxballPlayer[]>()) == TeamSetup.Default), configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -102,7 +102,7 @@ HBInit = roomConfiguration => {{
         // arrange
         var page = await SetUpPage();
         var functions = new Mock<IHaxballApiFunctions>();
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -120,7 +120,7 @@ HBInit = roomConfiguration => {{
         var page = await SetUpPage($"_ => {{ return {{ getPlayerList: _ => [ {{ id: {expected.Id} }} ] }}; }}");
         var functions = new Mock<IHaxballApiFunctions>();
         functions.Setup(f => f.StartGame(It.IsAny<string>(), It.IsAny<HaxballPlayer[]>())).Returns(true);
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -137,7 +137,7 @@ HBInit = roomConfiguration => {{
         var page = await SetUpPage("_ => { return { getPlayerList: _ => [], sendChat: message => window.message = message }; }");
         var functions = new Mock<IHaxballApiFunctions>();
         functions.Setup(f => f.StartGame(It.IsAny<string>(), It.IsAny<HaxballPlayer[]>())).Returns(false);
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -155,7 +155,7 @@ HBInit = roomConfiguration => {{
         var page = await SetUpPage("_ => { return { sendChat: message => window.message = message }; }");
         var functions = new Mock<IHaxballApiFunctions>();
         functions.Setup(f => f.FinishGame(It.IsAny<HaxballScores>())).Returns(false);
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -172,7 +172,7 @@ HBInit = roomConfiguration => {{
         // arrange
         var page = await SetUpPage("_ => { return { getPlayerList: () => [ { id: 1 } ] }; }");
         var functions = new Mock<IHaxballApiFunctions>();
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -188,7 +188,7 @@ HBInit = roomConfiguration => {{
         // arrange
         var page = await SetUpPage("_ => { return { getPlayerList: () => [] }; }");
         var functions = new Mock<IHaxballApiFunctions>();
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -206,7 +206,7 @@ HBInit = roomConfiguration => {{
         var page = await SetUpPage("_ => { return { sendChat: message => window.message = message }; }");
         var functions = new Mock<IHaxballApiFunctions>();
         functions.Setup(f => f.HandleCommand(It.IsAny<HaxballPlayer>(), It.IsAny<string>())).Returns(expected);
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -222,9 +222,9 @@ HBInit = roomConfiguration => {{
     {
         // arrange
         var expected = "QQ==";
-        var page = await SetUpPage("_ => { return { stopRecording: () => [65] }; }");
+        var page = await SetUpPage("_ => { return { stopRecording: () => [65], getPlayerList: () => [] }; }");
         var functions = new Mock<IHaxballApiFunctions>();
-        var api = new HaxballApi(functions.Object, Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(partyManager => partyManager.RoundRobin(It.IsAny<HaxballPlayer[]>()) == TeamSetup.Default), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
