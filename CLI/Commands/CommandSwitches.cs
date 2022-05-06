@@ -24,6 +24,7 @@ public static class CommandSwitches
         { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.Public)}", new [] { "--public" } },
         { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.NoPlayer)}", new [] { "--no-player" } },
         { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.TimeLimit)}", new [] { "--time-limit" } },
-        { nameof(Configuration.Headless), new [] { "--headless", "-h" } }
+        { nameof(Configuration.Headless), new [] { "--headless", "-h" } },
+        { $"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.PartyManagement)}", new [] { "--party-management", "-m" } }
     };
 }

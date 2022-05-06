@@ -9,13 +9,15 @@ public class HaxballApi : IDisposable
     public string? Token { get; }
     public Page Page { get; }
     public IHaxballApiFunctions ApiFunctions { get; }
+    public IPartyManager PartyManager { get; }
     private Configuration Configuration { get; }
 
-    public HaxballApi(IHaxballApiFunctions apiFunctions, Configuration configuration, Page page, string? token)
+    public HaxballApi(IHaxballApiFunctions apiFunctions, IPartyManager partyManager, Configuration configuration, Page page, string? token)
     {
         Token = token;
         Page = page;
         ApiFunctions = apiFunctions;
+        PartyManager = partyManager;
         Configuration = configuration;
     }
 

@@ -22,7 +22,8 @@ public class RoomsService
         if (Browser is null) await InitBrowser(configuration);
 
         var apiFunctions = new HaxballApiFunctions(new HaxbotContext(configuration));
-        var api = new HaxballApi(apiFunctions, configuration, await Browser!.NewPageAsync(), token);
+        var partyManager = new PartyManager();
+        var api = new HaxballApi(apiFunctions, partyManager, configuration, await Browser!.NewPageAsync(), token);
 
         var urlTask = api.CreateRoomAsync(5000);
         string url;

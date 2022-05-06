@@ -8,4 +8,5 @@ public record RoomConfiguration
     public bool NoPlayer { get; init; } = true;
     public string PlayerName { get; init; } = "Haxbot";
     public int TimeLimit { get; init; } = 5;
+    public PartyManagement PartyManagement { get; init; } = PartyManagement.RoundRobin;
 }

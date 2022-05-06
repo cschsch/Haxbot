@@ -45,7 +45,9 @@ public class HaxbotApp
             waitEvent.Set();
         };
 
-        var api = new HaxballApi(haxballApiFunctions, Configuration, page, token);
+        var partyManager = new PartyManager();
+
+        var api = new HaxballApi(haxballApiFunctions, partyManager, Configuration, page, token);
         var roomLink = await api.CreateRoomAsync();
         Console.WriteLine(roomLink);
 

@@ -30,7 +30,8 @@ public static class CommandFactories
             new Option<bool>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.Public)}"], () => configuration.RoomConfiguration.Public, "Whether to make the room public"),
             new Option<bool>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.NoPlayer)}"], () => configuration.RoomConfiguration.NoPlayer, "Set to false if you wish the bot to join. Required for command handling."),
             new Option<int>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.TimeLimit)}"], () => configuration.RoomConfiguration.TimeLimit, "Set time limit of games played"),
-            new Option<bool>(CommandSwitches.CreateRoomSwitches[nameof(Configuration.Headless)], () => configuration.Headless, "Whether to run the browser headless or not.")
+            new Option<bool>(CommandSwitches.CreateRoomSwitches[nameof(Configuration.Headless)], () => configuration.Headless, "Whether to run the browser headless or not."),
+            new Option<PartyManagement>(CommandSwitches.CreateRoomSwitches[$"{nameof(Configuration.RoomConfiguration)}:{nameof(RoomConfiguration.PartyManagement)}"], () => configuration.RoomConfiguration.PartyManagement, "Chosen mode of party management.")
         };
         var tokenOption = new Option<string?>(new[] { "--token", "-t" }, "Haxball API token. Required if headless. Obtain here: https://www.haxball.com/headlesstoken");
         createCommand.AddOptions(tokenOption);
