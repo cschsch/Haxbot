@@ -36,6 +36,17 @@
         </Field>
         <Divider />
         <Field Horizontal>
+            <FieldLabel ColumnSize="ColumnSize.Is3">Party Management</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is9">
+                <Select TValue="PartyManagement" @bind-SelectedValue="@_partyManagement">
+                    <SelectItem Value="PartyManagement.None">None</SelectItem>
+                    <SelectItem Value="PartyManagement.Shuffle">Shuffle</SelectItem>
+                    <SelectItem Value="PartyManagement.RoundRobin">Round Robin</SelectItem>
+                </Select>
+            </FieldBody>
+        </Field>
+        <Divider />
+        <Field Horizontal>
             <FieldLabel ColumnSize="ColumnSize.Is2">Room admins</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is10">
                 <Select TValue="string" Multiple @bind-SelectedValues="@_selectedAuths">
@@ -67,6 +78,7 @@
     <DataGridColumns>
         <DataGridColumn Field="RoomConfiguration.RoomName" Caption="Name" />
         <DataGridColumn Field="RoomConfiguration.TimeLimit" Caption="Time limit" />
+        <DataGridColumn Field="RoomConfiguration.PartyManagement" Caption="Party management" />
         <DataGridColumn Field="RoomConfiguration.Public" Caption="Public" Filterable="false">
             <DisplayTemplate>
                 <Check Checked="@((context as Room)!.RoomConfiguration.Public)" Disabled/>
@@ -89,6 +101,7 @@
     private string _roomName = string.Empty;
     private bool _public;
     private int _timeLimit = 1;
+    private PartyManagement _partyManagement;
     private IReadOnlyList<string> _selectedAuths = Array.Empty<string>();
     private string? _password;
     private string _token = string.Empty;
@@ -100,6 +113,7 @@
         _public = BaseConfiguration.RoomConfiguration.Public;
         _timeLimit = BaseConfiguration.RoomConfiguration.TimeLimit;
         _selectedAuths = BaseConfiguration.RoomAdmins;
+        _partyManagement = BaseConfiguration.RoomConfiguration.PartyManagement;
         return base.OnInitializedAsync();
     }
 
@@ -110,7 +124,8 @@
             RoomName = _roomName,
             Password = string.IsNullOrWhiteSpace(_password) ? null : _password,
             Public = _public,
-            TimeLimit = _timeLimit
+            TimeLimit = _timeLimit,
+            PartyManagement = _partyManagement
         };
         var configuration = BaseConfiguration with
         {
