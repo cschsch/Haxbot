@@ -85,7 +85,7 @@ HBInit = roomConfiguration => {{
         var auth = "admin";
         var page = await SetUpPage("_ => { return { setPlayerAdmin: (id, value) => window.admin = value, getPlayerList: () => [] }; }");
         var configuration = Configuration with { RoomAdmins = new [] { auth } };
-        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Mock.Of<IPartyManager>(partyManager => partyManager.RoundRobin(It.IsAny<HaxballPlayer[]>()) == TeamSetup.Default), configuration, page, string.Empty);
+        var api = new HaxballApi(Mock.Of<IHaxballApiFunctions>(), Mock.Of<IPartyManager>(), configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();
@@ -100,7 +100,7 @@ HBInit = roomConfiguration => {{
     public async Task PlayerJoinedRoom_CallsOnPlayerJoin()
     {
         // arrange
-        var page = await SetUpPage();
+        var page = await SetUpPage("_ => { return { getPlayerList: _ => [] }; }");
         var functions = new Mock<IHaxballApiFunctions>();
         var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
@@ -224,7 +224,7 @@ HBInit = roomConfiguration => {{
         var expected = "QQ==";
         var page = await SetUpPage("_ => { return { stopRecording: () => [65], getPlayerList: () => [] }; }");
         var functions = new Mock<IHaxballApiFunctions>();
-        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(partyManager => partyManager.RoundRobin(It.IsAny<HaxballPlayer[]>()) == TeamSetup.Default), Configuration, page, string.Empty);
+        var api = new HaxballApi(functions.Object, Mock.Of<IPartyManager>(), Configuration, page, string.Empty);
 
         // act
         await api.CreateRoomAsync();

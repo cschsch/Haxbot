@@ -1,16 +1,20 @@
-﻿namespace Haxbot.Api;
+﻿using Haxbot.Extensions;
+using System.Collections.Immutable;
+
+namespace Haxbot.Api;
 
 public interface IPartyManager
 {
-    TeamSetup None(HaxballPlayer[] players);
-    TeamSetup Shuffle(HaxballPlayer[] players);
-    TeamSetup RoundRobin(HaxballPlayer[] players);
+    HaxballPlayer[] None(HaxballPlayer[] players);
+    HaxballPlayer[] Shuffle(HaxballPlayer[] players);
+    HaxballPlayer[] RoundRobin(HaxballPlayer[] players);
 }
 
 public class PartyManager : IPartyManager
 {
     private Random Random { get; }
-    private TeamSetup LastTeamSetup { get; set; } = TeamSetup.Default;
+    private ImmutableHashSet<HaxballPlayer> Players { get; set; } = ImmutableHashSet<HaxballPlayer>.Empty;
+    private Queue<HaxballPlayer[]> TeamSetups { get; } = new Queue<HaxballPlayer[]>();
 
     public PartyManager(Random random)
     {
@@ -21,33 +25,54 @@ public class PartyManager : IPartyManager
     {
     }
 
-    public TeamSetup None(HaxballPlayer[] players)
+    public HaxballPlayer[] None(HaxballPlayer[] players)
     {
-        return TeamSetup.Default;
+        return Array.Empty<HaxballPlayer>();
     }
 
-    public TeamSetup Shuffle(HaxballPlayer[] players)
+    public HaxballPlayer[] Shuffle(HaxballPlayer[] players)
     {
-        if (players.Length < 2) return TeamSetup.Default;
+        if (players.Length < 2) return Array.Empty<HaxballPlayer>();
         var teamSize = players.Length / 2;
         var shuffled = players.OrderBy(_ => Random.Next()).ToArray();
-        var red = shuffled.Take(teamSize).ToArray();
-        var blue = shuffled.Skip(teamSize).Take(teamSize).ToArray();
-        return new(red, blue);
+        var red = SetTeam(shuffled.Take(teamSize), TeamId.Red);
+        var blue = SetTeam(shuffled.Skip(teamSize).Take(teamSize), TeamId.Blue);
+        return red.Concat(blue).ToArray();
     }
 
-    public TeamSetup RoundRobin(HaxballPlayer[] players)
+    public HaxballPlayer[] RoundRobin(HaxballPlayer[] players)
     {
-        if (players.Length < 2) return TeamSetup.Default;
-        var newSetup = (LastTeamSetup == TeamSetup.Default || LastTeamSetup.TotalCount != players.Length) ? Shuffle(players) : NextCycle();
-        LastTeamSetup = newSetup;
-        return newSetup;
+        if (players.Length < 2) return Array.Empty<HaxballPlayer>();
+        if (!Players.SetEquals(players)) InitTeamSetups(players);
+
+        var next = TeamSetups.Dequeue();
+        TeamSetups.Enqueue(next);
+        return next;
     }
 
-    private TeamSetup NextCycle()
+    private void InitTeamSetups(HaxballPlayer[] players)
     {
-        var red = LastTeamSetup.Red.Prepend(LastTeamSetup.Blue.First()).Take(LastTeamSetup.Red.Length).ToArray();
-        var blue = LastTeamSetup.Blue.Append(LastTeamSetup.Red.Last()).Skip(1).ToArray();
-        return new(red, blue);
+        Players = players.ToImmutableHashSet();
+        TeamSetups.Clear();
+        var teamSize = players.Length / 2;
+        var teams = Players.Subsets().Where(team => team.Count == teamSize).ToArray();
+
+        foreach (var red in teams.Take(teams.Length / 2))
+        {
+            foreach (var blue in teams.Where(team => !team.Intersect(red).Any()))
+            {
+                TeamSetups.Enqueue(SetTeam(red, TeamId.Red).Concat(SetTeam(blue, TeamId.Blue)).ToArray());
+            }
+        }
+
+        foreach (var blue in teams.Take(teams.Length / 2))
+        {
+            foreach (var red in teams.Where(team => !team.Intersect(blue).Any()))
+            {
+                TeamSetups.Enqueue(SetTeam(red, TeamId.Red).Concat(SetTeam(blue, TeamId.Blue)).ToArray());
+            }
+        }
     }
+
+    private static IEnumerable<HaxballPlayer> SetTeam(IEnumerable<HaxballPlayer> players, TeamId team) => players.Select(player => player with { Team = team });
 }

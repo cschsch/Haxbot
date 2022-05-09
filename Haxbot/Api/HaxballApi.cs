@@ -36,8 +36,7 @@ public class HaxballApi : IDisposable
         idAuths.push([player.id, player.auth]);
         await playerJoined(player);
         const newTeamSetup = await nextTeamSetup(room.getPlayerList());
-        for (const player of newTeamSetup.red) { room.setPlayerTeam(player.id, 1); }
-        for (const player of newTeamSetup.blue) { room.setPlayerTeam(player.id, 2); }
+        for (const player of newTeamSetup) { room.setPlayerTeam(player.id, player.team); }
         if (!admins.includes(player.auth)) return;
         room.setPlayerAdmin(player.id, true);
     };
@@ -75,8 +74,7 @@ public class HaxballApi : IDisposable
         await saveReplay(base64);
         await finishGame({ red: 0, blue: 0 });
         const newTeamSetup = await nextTeamSetup(room.getPlayerList());
-        for (const player of newTeamSetup.red) { room.setPlayerTeam(player.id, 1); }
-        for (const player of newTeamSetup.blue) { room.setPlayerTeam(player.id, 2); }
+        for (const player of newTeamSetup) { room.setPlayerTeam(player.id, player.team); }
     }
 }", Configuration.RoomConfiguration, Token, Configuration.RoomAdmins);
 
@@ -96,17 +94,17 @@ public class HaxballApi : IDisposable
         var exposeCloseRoom = Page.ExposeFunctionAsync("closeRoom", ApiFunctions.CloseRoom);
         var exposeHandleCommand = Page.ExposeFunctionAsync<HaxballPlayer, string, string>("handleCommand", ApiFunctions.HandleCommand);
         var exposeSaveReplay = Page.ExposeFunctionAsync<string, object>("saveReplay", base64 => { ApiFunctions.SaveReplay(base64); return default!; });
-        var exposeNextTeamSetup = Page.ExposeFunctionAsync<HaxballPlayer[], TeamSetup>("nextTeamSetup", NextTeamSetup);
+        var exposeNextTeamSetup = Page.ExposeFunctionAsync<HaxballPlayer[], HaxballPlayer[]>("nextTeamSetup", NextTeamSetup);
         await Task.WhenAll(exposePlayerJoined, exposeStartGame, exposeFinishGame, exposeHandleCommand, exposeSaveReplay, exposeNextTeamSetup);
     }
 
-    private TeamSetup NextTeamSetup(HaxballPlayer[] players) =>
+    private HaxballPlayer[] NextTeamSetup(HaxballPlayer[] players) =>
         Configuration.RoomConfiguration.PartyManagement switch
         {
             PartyManagement.None => PartyManager.None(players),
             PartyManagement.Shuffle => PartyManager.Shuffle(players),
             PartyManagement.RoundRobin => PartyManager.RoundRobin(players),
-            _ => TeamSetup.Default
+            _ => Array.Empty<HaxballPlayer>()
         };
 
     public void Dispose()
