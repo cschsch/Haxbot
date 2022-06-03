@@ -13,27 +13,9 @@
 
 <Paragraph>Use this to filter previously played games and to display various stats taken from them in graphs.</Paragraph>
 
-<Row Gutter="(32, 16)">
-    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <PlayerFilter QueryModel="QueryModel" />
-    </Column>
-    <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <TimeFilter QueryModel="QueryModel" />
-    </Column>
-</Row>
-<Row Gutter="(32, 16)" Margin="Margin.Is1.FromTop">
-    <Column ColumnSize="ColumnSize.Is5" Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <MiscFilter QueryModel="QueryModel" />
-    </Column>
-    <Column ColumnSize="ColumnSize.Is5" Margin="Margin.Is1" Border="Border.Is1.Rounded">
-        <Heading Size="HeadingSize.Is6">Options for data aggregation</Heading>
-        <Divider />
-        <Check @bind-Checked="_groupByTeam">Group by teams instead of players</Check>
-    </Column>
-    <Column Margin="Margin.Is1">
-        <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(() => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames())!)" Color="Color.Primary">Aggregate</Button>
-    </Column>
-</Row>
+<StatQueryFilter 
+    QueryModel="QueryModel"
+    OnSearch="@(() => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames())!)" />
 
 <Divider />
 
@@ -120,9 +102,8 @@
 </Tabs>
 
 @code {
-    private GamesQueryModel QueryModel { get; } = new();
+    private StatQueryModel QueryModel { get; } = new();
     private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
-    private bool _groupByTeam;
     private string _selectedMainTab = "cumulative";
     private List<string> _selectedSubTabs = new List<string>
     {
@@ -294,7 +275,7 @@
     {
         var games = GamesService.GetGames(QueryModel);
         if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
-        _stats = _groupByTeam
+        _stats = QueryModel.GroupByTeam
             ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray()
             : GamesService.CollectStats<PlayerStatsCollector>(games).ToArray();
         await RedrawCharts();
