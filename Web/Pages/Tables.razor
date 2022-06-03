@@ -1,7 +1,49 @@
 ﻿@page "/tables"
+@using Haxbot.Stats
+@using Web.Data
+@inject GamesService GamesService
+@inject INotificationService NotificationService
 
 <PageTitle>Tables</PageTitle>
 
 <Heading Size="HeadingSize.Is1">Tables</Heading>
 
 <Paragraph>Use this to filter previously played games and to display various stats taken from them in tables.</Paragraph>
+
+<StatQueryFilter 
+    QueryModel="QueryModel" 
+    OnSearch="@(() => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames())!)" />
+
+<Divider />
+
+<DataGrid
+    TItem="FlattenedGameStats"
+    Data="_stats"
+    Responsive
+    Filterable FilterMethod="DataGridFilterMethod.Contains" 
+    Sortable SortMode="DataGridSortMode.Multiple" 
+    Resizable ResizeMode="TableResizeMode.Columns">
+    <DataGridColumns>
+        <DataGridColumn Field="@nameof(FlattenedGameStats.Identification)" Caption="Identification" />
+        <DataGridColumn Field="@nameof(FlattenedGameStats.AmountWon)" Caption="Won" />
+        <DataGridColumn Field="@nameof(FlattenedGameStats.AmountLost)" Caption="Lost" />
+        <DataGridColumn Field="@nameof(FlattenedGameStats.AmountPlayed)" Caption="Played" />
+        <DataGridNumericColumn Field="@nameof(FlattenedGameStats.Winrate)" Caption="Winrate (%)" />
+        <DataGridNumericColumn Field="@nameof(FlattenedGameStats.WinLoseRatio)" Caption="Win / Lose" />
+    </DataGridColumns>
+</DataGrid>
+
+@code {
+    private StatQueryModel QueryModel { get; } = new();
+    private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
+
+    private async Task GetGames()
+    {
+        var games = GamesService.GetGames(QueryModel);
+        if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
+        var grouped = QueryModel.GroupByTeam
+            ? GamesService.CollectStats<TeamStatsCollector>(games)
+            : GamesService.CollectStats<PlayerStatsCollector>(games);
+        _stats = grouped.OrderByDescending(stats => stats.Winrate).ThenByDescending(stats => stats.AmountPlayed).ThenBy(stats => stats.Identification).ToArray();
+    }
+}

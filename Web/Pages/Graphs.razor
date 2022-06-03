@@ -1,13 +1,12 @@
 ﻿@page "/graphs"
-
-<PageTitle>Graphs</PageTitle>
-
 @using Haxbot.Entities
 @using Haxbot.Extensions
 @using Haxbot.Stats
 @using Web.Data
 @inject GamesService GamesService
 @inject INotificationService NotificationService
+
+<PageTitle>Graphs</PageTitle>
 
 <Heading Size="HeadingSize.Is1">Graphs</Heading>
 
@@ -276,8 +275,8 @@
         var games = GamesService.GetGames(QueryModel);
         if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
         _stats = QueryModel.GroupByTeam
-            ? GamesService.CollectStats<TeamStatsCollector>(games).ToArray()
-            : GamesService.CollectStats<PlayerStatsCollector>(games).ToArray();
+            ? GamesService.CollectStats<DayStatsCollector<TeamStatsCollector>>(games).ToArray()
+            : GamesService.CollectStats<DayStatsCollector<PlayerStatsCollector>>(games).ToArray();
         await RedrawCharts();
     }
 }
