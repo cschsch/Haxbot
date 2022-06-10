@@ -25,7 +25,7 @@
                 {
                     <Check TValue="bool" CheckedChanged="@((value) => OnGroupingCheckedChanged(value, grouping))">@grouping.ToString()</Check>
                 }
-                <FieldHelp>Values to group by. Order matters!</FieldHelp>
+                <FieldHelp>Values to group by.</FieldHelp>
             </Field>
         }
         <Field Margin="Margin.Is1" Padding="Padding.Is1" Border="Border.Is1.Rounded">
@@ -37,15 +37,6 @@
                 }
                 <FieldHelp>The entity to group by. You can only choose one.</FieldHelp>
             </RadioGroup>
-        </Field>
-        <Field Margin="Margin.Is1" Padding="Padding.Is1" Border="Border.Is1.Rounded">
-            <FieldLabel>Order of groupings</FieldLabel>
-            <UnorderedList>
-                <Repeater Items="_selectedGroupings">
-                    <UnorderedListItem>@context.ToString()</UnorderedListItem>
-                </Repeater>
-                <UnorderedListItem>@QueryModel.ChosenResultGrouping.ToString()</UnorderedListItem>
-            </UnorderedList>
         </Field>
     </Column>
     <Column Margin="Margin.Is1">
