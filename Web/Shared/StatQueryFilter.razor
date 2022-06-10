@@ -1,4 +1,6 @@
-﻿@using Web.Data
+﻿@using Haxbot.Stats
+@using System.Collections.ObjectModel
+@using Web.Data
 
 <Row Gutter="(32, 16)">
     <Column Margin="Margin.Is1" Border="Border.Is1.Rounded">
@@ -15,17 +17,54 @@
     <Column ColumnSize="ColumnSize.Is5" Margin="Margin.Is1" Border="Border.Is1.Rounded">
         <Heading Size="HeadingSize.Is6">Options for data aggregation</Heading>
         <Divider />
-        <Check @bind-Checked="QueryModel.GroupByTeam">Group by teams instead of players</Check>
+        @if (_possibleNonResultGroupings.Any())
+        {
+            <Field Margin="Margin.Is1" Padding="Padding.Is1" Border="Border.Is1.Rounded">
+                <FieldLabel>Groupings</FieldLabel>
+                @foreach (var grouping in _possibleNonResultGroupings)
+                {
+                    <Check TValue="bool" CheckedChanged="@((value) => OnGroupingCheckedChanged(value, grouping))">@grouping.ToString()</Check>
+                }
+                <FieldHelp>Values to group by. Order matters!</FieldHelp>
+            </Field>
+        }
+        <Field Margin="Margin.Is1" Padding="Padding.Is1" Border="Border.Is1.Rounded">
+            <FieldLabel>Result Grouping</FieldLabel>
+            <RadioGroup TValue="Grouping" @bind-CheckedValue="QueryModel.ChosenResultGrouping">
+                @foreach (var resultGrouping in QueryModel.PossibleGroupings.Intersect(GroupingHelper.ResultGroupings))
+                {
+                    <Radio Value="resultGrouping">@resultGrouping.ToString()</Radio>
+                }
+                <FieldHelp>The entity to group by. You can only choose one.</FieldHelp>
+            </RadioGroup>
+        </Field>
+        <Field Margin="Margin.Is1" Padding="Padding.Is1" Border="Border.Is1.Rounded">
+            <FieldLabel>Order of groupings</FieldLabel>
+            <UnorderedList>
+                <Repeater Items="_selectedGroupings">
+                    <UnorderedListItem>@context.ToString()</UnorderedListItem>
+                </Repeater>
+                <UnorderedListItem>@QueryModel.ChosenResultGrouping.ToString()</UnorderedListItem>
+            </UnorderedList>
+        </Field>
     </Column>
     <Column Margin="Margin.Is1">
-        <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@OnSearch" Color="Color.Primary">Apply</Button>
+        <Button Size="Size.Large" Position="Position.Absolute.Bottom.Is0.End.Is0" Clicked="@(async () => await OnSearch.InvokeAsync(_selectedGroupings.Append(QueryModel.ChosenResultGrouping)))" Color="Color.Primary">Apply</Button>
     </Column>
 </Row>
 
 @code {
     [Parameter]
     public StatQueryModel QueryModel { get; set; } = new();
+    private Grouping[] _possibleNonResultGroupings => QueryModel.PossibleGroupings.Except(GroupingHelper.ResultGroupings).ToArray();
+    private ObservableCollection<Grouping> _selectedGroupings = new();
 
     [Parameter]
-    public EventCallback OnSearch { get; set; } = new();
+    public EventCallback<IEnumerable<Grouping>> OnSearch { get; set; } = new();
+
+    private void OnGroupingCheckedChanged(bool value, Grouping grouping)
+    {
+        if (value) _selectedGroupings.Add(grouping);
+        else _selectedGroupings.Remove(grouping);
+    }
 }

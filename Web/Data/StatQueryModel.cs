@@ -1,6 +1,9 @@
-﻿namespace Web.Data;
+﻿using Haxbot.Stats;
+
+namespace Web.Data;
 
 public class StatQueryModel : GamesQueryModel
 {
-    public bool GroupByTeam { get; set; }
+    public IReadOnlyList<Grouping> PossibleGroupings { get; init; } = new List<Grouping>();
+    public Grouping ChosenResultGrouping { get; set; } = Grouping.Player;
 }

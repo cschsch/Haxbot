@@ -33,10 +33,8 @@ public class GamesService
         return gamesQueryModel.Team ? games.WithTeam(GetTeam(players)) : games.WithAny(players);
     }
 
-    public IEnumerable<FlattenedGameStats> CollectStats<TCollector>(IEnumerable<Game> games) 
-        where TCollector : IStatsCollector, new()
+    public IEnumerable<FlattenedGameStats> CollectStats(IStatsCollector collector, IEnumerable<Game> games)
     {
-        var collector = new TCollector();
         foreach (var game in games)
         {
             collector.Register(game, Context.Players!);

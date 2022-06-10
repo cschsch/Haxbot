@@ -12,7 +12,7 @@
 
 <StatQueryFilter 
     QueryModel="QueryModel" 
-    OnSearch="@(() => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames())!)" />
+    OnSearch="@((groupings) => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames(groupings))!)" />
 
 <Divider />
 
@@ -22,9 +22,12 @@
     Responsive
     Filterable FilterMethod="DataGridFilterMethod.Contains" 
     Sortable SortMode="DataGridSortMode.Multiple" 
-    Resizable ResizeMode="TableResizeMode.Columns">
+    Resizable ResizeMode="TableResizeMode.Columns"
+    ShowPager PageSize="10" ShowPageSizes PageSizes="@(new [] { 5, 10, 25, 50 })">
     <DataGridColumns>
         <DataGridColumn Field="@nameof(FlattenedGameStats.Identification)" Caption="Identification" />
+        <DataGridColumn Field="@nameof(FlattenedGameStats.Stadium)" Caption="Stadium" SortField="Stadium.Name" />
+        <DataGridDateColumn Field="@nameof(FlattenedGameStats.Date)" Caption="Date" />
         <DataGridColumn Field="@nameof(FlattenedGameStats.AmountWon)" Caption="Won" />
         <DataGridColumn Field="@nameof(FlattenedGameStats.AmountLost)" Caption="Lost" />
         <DataGridColumn Field="@nameof(FlattenedGameStats.AmountPlayed)" Caption="Played" />
@@ -34,16 +37,18 @@
 </DataGrid>
 
 @code {
-    private StatQueryModel QueryModel { get; } = new();
+    private StatQueryModel QueryModel { get; } = new() 
+    { 
+        PossibleGroupings = new[] { Grouping.Stadium, Grouping.Day }.Concat(GroupingHelper.ResultGroupings).ToArray()
+    };
     private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
 
-    private async Task GetGames()
+    private async Task GetGames(IEnumerable<Grouping> groupings)
     {
         var games = GamesService.GetGames(QueryModel);
         if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
-        var grouped = QueryModel.GroupByTeam
-            ? GamesService.CollectStats<TeamStatsCollector>(games)
-            : GamesService.CollectStats<PlayerStatsCollector>(games);
-        _stats = grouped.OrderByDescending(stats => stats.Winrate).ThenByDescending(stats => stats.AmountPlayed).ThenBy(stats => stats.Identification).ToArray();
+        var collector = GroupingHelper.GetCollector(groupings.ToArray());
+        var grouped = GamesService.CollectStats(collector, games).ToArray();
+        _stats = grouped;
     }
 }

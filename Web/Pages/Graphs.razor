@@ -14,7 +14,7 @@
 
 <StatQueryFilter 
     QueryModel="QueryModel"
-    OnSearch="@(() => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames())!)" />
+    OnSearch="@((groupings) => NotificationService?.Info("Searching for games...")!.ContinueWith(_ => GetGames(groupings))!)" />
 
 <Divider />
 
@@ -101,7 +101,10 @@
 </Tabs>
 
 @code {
-    private StatQueryModel QueryModel { get; } = new();
+    private StatQueryModel QueryModel { get; } = new() 
+    { 
+        PossibleGroupings = GroupingHelper.ResultGroupings
+    };
     private FlattenedGameStats[] _stats = Array.Empty<FlattenedGameStats>();
     private string _selectedMainTab = "cumulative";
     private List<string> _selectedSubTabs = new List<string>
@@ -270,13 +273,12 @@
         }
     }
 
-    private async Task GetGames()
+    private async Task GetGames(IEnumerable<Grouping> groupings)
     {
         var games = GamesService.GetGames(QueryModel);
         if (!games.Any()) await NotificationService?.Warning("Try changing your search criteria.", "No games found!")!;
-        _stats = QueryModel.GroupByTeam
-            ? GamesService.CollectStats<DayStatsCollector<TeamStatsCollector>>(games).ToArray()
-            : GamesService.CollectStats<DayStatsCollector<PlayerStatsCollector>>(games).ToArray();
+        var collector = GroupingHelper.GetCollector(groupings.Prepend(Grouping.Day).ToArray());
+        _stats = GamesService.CollectStats(collector, games).ToArray();
         await RedrawCharts();
     }
 }
