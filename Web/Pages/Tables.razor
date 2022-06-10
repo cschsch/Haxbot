@@ -26,7 +26,13 @@
     ShowPager PageSize="10" ShowPageSizes PageSizes="@(new [] { 5, 10, 25, 50 })">
     <DataGridColumns>
         <DataGridColumn Field="@nameof(FlattenedGameStats.Identification)" Caption="Identification" />
-        <DataGridColumn Field="@nameof(FlattenedGameStats.Stadium)" Caption="Stadium" SortField="Stadium.Name" />
+        <DataGridColumn Field="@nameof(FlattenedGameStats.Stadium)" Caption="Stadium" SortField="Stadium.Name">
+            <DisplayTemplate>
+                @{
+                    @((context as FlattenedGameStats)?.Stadium?.Name)
+                }
+            </DisplayTemplate>
+        </DataGridColumn>
         <DataGridDateColumn Field="@nameof(FlattenedGameStats.Date)" Caption="Date" />
         <DataGridColumn Field="@nameof(FlattenedGameStats.AmountWon)" Caption="Won" />
         <DataGridColumn Field="@nameof(FlattenedGameStats.AmountLost)" Caption="Lost" />
