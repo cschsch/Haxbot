@@ -42,7 +42,7 @@ public static class CommandFactories
     public static Command GetOverviewCommand(HaxbotApp app, BinderBase<QueryFilter> filterBinder)
     {
         var overviewCommand = new Command("overview", "Prints an overview for each of the given options.");
-        var resultGroupingsNames = StatsPrinter.ResultGroupings.Select(grouping => grouping.ToString());
+        var resultGroupingsNames = GroupingHelper.ResultGroupings.Select(grouping => grouping.ToString());
         var groupingsArgument = new Argument<Grouping[]>("Groupings", () => new[] { Grouping.Player },
         $@"Groupings to apply before counting results
 

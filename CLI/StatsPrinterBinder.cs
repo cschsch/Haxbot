@@ -1,4 +1,4 @@
-﻿using CLI.Commands;
+﻿using Haxbot.Stats;
 using System.CommandLine;
 using System.CommandLine.Binding;
 
